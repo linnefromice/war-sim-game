@@ -1,0 +1,153 @@
+.root {
+  /*
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  */
+}
+
+.player-info {
+  margin: 0px 24px;
+}
+
+.play-area {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.stage {
+  margin: 4px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.cell {
+  margin: 1px;
+  height: 64px;
+  width: 64px;
+  border-radius: 8px;
+  background-color: whitesmoke;
+  border: 1px solid silver;
+
+  &-unit {
+    background-color: rgba(255, 0, 0, 0.125); // override by player's color
+  }
+
+  &-active-unit {
+    background-color: rgba(255, 0, 0, 0.375); // override by player's color
+  }
+
+  &-unit-status-md {
+    font-size: 12px;
+  }
+
+  &-unit-status-sm {
+    font-size: 8px;
+  }
+
+  &-unit-status-xs {
+    font-size: 4px;
+  }
+
+  &-move-range {
+    background-color: royalblue;
+  }
+
+  &-attack-range {
+    background-color: lightcoral;
+  }
+
+  &-content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &-image {
+      flex-grow: 1;
+    }
+
+    &-text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+      div {
+        line-height: 0.75rem;
+      }
+    }
+  }
+}
+
+.action {
+  &-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    &-btn {
+      width: 108px;
+      margin: 4px;
+      padding: 8px 16px;
+      background-color: #808080; // gray
+      border: 2px solid #acacac; // light gray
+      border-radius: 4px;
+      color: white;
+
+      &-active {
+        background-color: #0000ff; // blue
+        border: 2px solid #52bdff; // light blue
+      }
+
+      &-selected {
+        background-color: #B2B2FF;
+        border: 2px solid #e5e5ff; // lavender
+      }
+
+      &:disabled {
+        background-color: #D8D8D8;
+        border: 2px solid #E5E5E5;
+      }
+    }
+  }
+
+  &-sub-menu {
+    margin-left: 64px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    &-description {
+      font-size: 4px;
+    }
+  }
+}
+
+
+
+.rotate {
+  &-90 {
+    transform: rotate(90deg);
+  }
+  &-180 {
+    transform: rotate(180deg);
+  }
+  &-270 {
+    transform: rotate(270deg);
+  }
+}
