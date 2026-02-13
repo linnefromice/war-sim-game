@@ -1,6 +1,6 @@
 import { Reducer } from "react";
 import { UnitType, OrientationType, StateType, ActionType, PayloadType, Player, PayloadMoveActionType, PayloadAttackActionType, ActionOptionType, StateActionMenuType } from "../../types";
-import { PLAYERS } from "../../constants";
+import { CELL_NUM_IN_ROW, PLAYERS, ROW_NUM } from "../../constants";
 
 export const INITIAL_ACTION_MENU: StateActionMenuType = {
   isOpen: false,
@@ -73,6 +73,14 @@ export const removeUnit = (
   const remains = units.filter((unit) => unit.spec.id !== targetId);
   return remains;
 };
+
+export const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
+  return 'x' in action && 'y' in action && !('target_unit_id' in action);
+}
+
+export const isPayloadAttackAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadAttackActionType => {
+  return 'target_unit_id' in action && 'armament_idx' in action;
+}
 
 export const reducer: Reducer<
   StateType,
@@ -159,7 +167,8 @@ export const reducer: Reducer<
 
   switch (type) {
     case "DO_MOVE": {
-      const newUnits = updateUnitsByMove(state.units, unit_in_action, payload.action as PayloadMoveActionType); // NOTE: need to type guard
+      if (!isPayloadMoveAction(payload.action)) return state;
+      const newUnits = updateUnitsByMove(state.units, unit_in_action, payload.action);
       return {
         ...state,
         actionMenu: {
@@ -170,19 +179,20 @@ export const reducer: Reducer<
       }
     }
     case "SELECT_ATTACK": {
-      const action = payload.action as PayloadAttackActionType;
+      if (!isPayloadAttackAction(payload.action)) return state;
       return {
         ...state,
         actionMenu: {
           isOpen: true,
           targetUnitId: unit_in_action.spec.id,
           activeActionOption: nextActionOptionFromPayloadType(type),
-          selectedArmamentIdx: action.armament_idx,
+          selectedArmamentIdx: payload.action.armament_idx,
         }
       }
     }
     case "DO_ATTACK": {
-      const newUnits = updateUnitsByAttack(state.units, unit_in_action, payload.action as PayloadAttackActionType); // NOTE: need to type guard
+      if (!isPayloadAttackAction(payload.action)) return state;
+      const newUnits = updateUnitsByAttack(state.units, unit_in_action, payload.action);
       return {
         ...state,
         actionMenu: {
@@ -204,12 +214,15 @@ const nextActionOptionFromPayloadType = (type: ActionType): ActionOptionType | n
 }
 
 const updateUnitsByMove = (oldUnits: UnitType[], unit_in_action: UnitType, payloadAction: PayloadMoveActionType): UnitType[] => {
+  const { x, y } = payloadAction;
+  if (x < 0 || x >= CELL_NUM_IN_ROW || y < 0 || y >= ROW_NUM) return oldUnits;
+
   const updatedUnit = {
     ...unit_in_action,
     status: {
       ...unit_in_action.status,
       previousCoordinate: unit_in_action.status.coordinate,
-      coordinate: { x: payloadAction.x, y: payloadAction.y },
+      coordinate: { x, y },
       moved: true,
     }
   }
@@ -217,9 +230,10 @@ const updateUnitsByMove = (oldUnits: UnitType[], unit_in_action: UnitType, paylo
 }
 
 const updateUnitsByAttack = (oldUnits: UnitType[], unit_in_action: UnitType, payloadAction: PayloadAttackActionType): UnitType[] => {
-  const attacked = loadUnit(payloadAction.target_unit_id, oldUnits);
-
   const armament = unit_in_action.spec.armaments[payloadAction.armament_idx];
+  if (armament.consumed_en > unit_in_action.status.en) return oldUnits;
+
+  const attacked = loadUnit(payloadAction.target_unit_id, oldUnits);
   const remainHp = attacked.status.hp - armament.value;
 
   // update for attacked
@@ -236,7 +250,7 @@ const updateUnitsByAttack = (oldUnits: UnitType[], unit_in_action: UnitType, pay
     })() : removeUnit(oldUnits, attacked.spec.id);
 
   // update for attacking
-  const remainEn = unit_in_action.status.en - armament.consumed_en; // NOTE: need to check if en is enough / TODO: validation
+  const remainEn = unit_in_action.status.en - armament.consumed_en;
 
   const updatedAttacking = {
     ...unit_in_action,
