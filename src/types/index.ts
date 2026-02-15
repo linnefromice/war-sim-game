@@ -7,14 +7,11 @@ export type OrientationType = typeof ORIENTATIONS[number]
 const ACTIONS = ["OPEN_MENU", "CLOSE_MENU", "TURN_END", "SELECT_MOVE", "SELECT_ATTACK", "DO_MOVE", "DO_ATTACK"] as const
 export type ActionType = typeof ACTIONS[number];
 
+export type UnitCategory = "fighter" | "tank" | "soldier"
+
 // State
 export type UnitType = { spec: UnitSpecType, status: UnitStatusType, playerId: number }
 
-export type StateType = {
-  activePlayerId: number
-  actionMenu: StateActionMenuType
-  units: UnitType[]
-}
 export type StateActionMenuType = {
   isOpen: boolean
   targetUnitId: number | null
@@ -46,8 +43,7 @@ export type Player = {
 export type UnitSpecType = {
   id: number;
   name: string;
-  // 1: fighterjet, 2: tank, 3: soldier
-  unit_type: number;
+  unit_type: UnitCategory;
   movement_range: number;
   max_hp: number;
   max_en: number;

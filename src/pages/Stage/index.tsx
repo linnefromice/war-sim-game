@@ -1,47 +1,128 @@
-import { createContext, useContext, useReducer, useState } from "react";
+import { createContext, useContext, useMemo, useReducer } from "react";
 import "./Stage.scss"
-import { ActionType, PayloadType, StateType } from "../../types";
-import { INITIAL_ACTION_MENU, getPlayer, loadUnit, reducer } from "./logics";
+import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
+import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
 import { CELL_NUM_IN_ROW, INITIAL_UNITS, PLAYERS, ROW_NUM } from "../../constants";
+import { GameState } from "../../game/types";
+import { gameReducer, getPlayer, loadUnit } from "../../game/gameReducer";
+import { ActionMenu } from "./ActionMenu";
 
-const initialState: StateType = {
-  activePlayerId: 1,
-  actionMenu: INITIAL_ACTION_MENU,
-  units: INITIAL_UNITS,
+const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
+  return 'x' in action && 'y' in action && !('target_unit_id' in action);
 }
 
-export const ActionContext = createContext({
-  state: initialState,
+const isPayloadAttackAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadAttackActionType => {
+  return 'target_unit_id' in action && 'armament_idx' in action;
+}
+
+const initialGameState: GameState = {
+  activePlayerId: 1,
+  units: INITIAL_UNITS,
+  phase: { type: "playing" },
+};
+
+export const ActionContext = createContext<{
+  gameState: GameState;
+  uiState: StateActionMenuType;
+  dispatch: (action: { type: ActionType; payload?: PayloadType }) => void;
+}>({
+  gameState: initialGameState,
+  uiState: INITIAL_ACTION_MENU,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  dispatch: (_: { type: ActionType, payload?: PayloadType }) => {},
+  dispatch: (_: { type: ActionType; payload?: PayloadType }) => {},
 });
 
-
 export const Stage = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [gameState, gameDispatch] = useReducer(gameReducer, initialGameState);
+  const [uiState, uiDispatch] = useReducer(uiReducer, INITIAL_ACTION_MENU);
+
+  const dispatch = (action: { type: ActionType; payload?: PayloadType }) => {
+    const { type, payload } = action;
+
+    switch (type) {
+      case "OPEN_MENU": {
+        if (payload?.running_unit_id === undefined) return;
+        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        if (unit.playerId !== gameState.activePlayerId) return;
+        uiDispatch({ type: "OPEN_MENU", unitId: payload.running_unit_id });
+        break;
+      }
+      case "CLOSE_MENU":
+        uiDispatch({ type: "CLOSE_MENU" });
+        break;
+      case "SELECT_MOVE": {
+        if (payload?.running_unit_id === undefined) return;
+        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        if (unit.playerId !== gameState.activePlayerId) return;
+        uiDispatch({ type: "SELECT_MOVE" });
+        break;
+      }
+      case "SELECT_ATTACK": {
+        if (payload?.running_unit_id === undefined) return;
+        if (payload.action === undefined) return;
+        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        if (unit.playerId !== gameState.activePlayerId) return;
+        if (!isPayloadAttackAction(payload.action)) return;
+        uiDispatch({ type: "SELECT_ATTACK", payload: payload.action });
+        break;
+      }
+      case "DO_MOVE": {
+        if (payload?.running_unit_id === undefined) return;
+        if (payload.action === undefined) return;
+        if (!isPayloadMoveAction(payload.action)) return;
+        gameDispatch({
+          type: "DO_MOVE",
+          unitId: payload.running_unit_id,
+          payload: payload.action,
+        });
+        uiDispatch({ type: "RESET" });
+        break;
+      }
+      case "DO_ATTACK": {
+        if (payload?.running_unit_id === undefined) return;
+        if (payload.action === undefined) return;
+        if (!isPayloadAttackAction(payload.action)) return;
+        gameDispatch({
+          type: "DO_ATTACK",
+          unitId: payload.running_unit_id,
+          payload: payload.action,
+        });
+        uiDispatch({ type: "RESET" });
+        break;
+      }
+      case "TURN_END":
+        gameDispatch({ type: "TURN_END" });
+        uiDispatch({ type: "RESET" });
+        break;
+    }
+  };
 
   return (
-    <ActionContext.Provider value={{ state, dispatch }}>
+    <ActionContext.Provider value={{ gameState, uiState, dispatch }}>
       <StageContent />
     </ActionContext.Provider>
-  )
-}
+  );
+};
 
 const StageContent = () => {
-  const { state } = useContext(ActionContext);
+  const { gameState, uiState } = useContext(ActionContext);
 
-  const unitsCoordinates = state.units.reduce((map, unit) => {
-    const { x, y } = unit.status.coordinate;
-    const mapKey = `x${x}y${y}`
-    if (map.has(mapKey)) {
-      throw new Error(`Duplicate coordinates: ${x},${y} oldUnit=${map.get(mapKey)} newUnit=${unit.spec.id}`)
-    }
-    map.set(mapKey, unit.spec.id);
-    return map;
-  }, new Map<string, number>())
+  const unitsCoordinates = useMemo(() => {
+    return gameState.units.reduce((map, unit) => {
+      const { x, y } = unit.status.coordinate;
+      const mapKey = `x${x}y${y}`;
+      if (map.has(mapKey)) {
+        throw new Error(
+          `Duplicate coordinates: ${x},${y} oldUnit=${map.get(mapKey)} newUnit=${unit.spec.id}`
+        );
+      }
+      map.set(mapKey, unit.spec.id);
+      return map;
+    }, new Map<string, number>());
+  }, [gameState.units]);
 
-  const activePlayer = getPlayer(state.activePlayerId, PLAYERS);
+  const activePlayer = getPlayer(gameState.activePlayerId, PLAYERS);
 
   return (
     <>
@@ -55,94 +136,48 @@ const StageContent = () => {
             <div key={`row.${y}`} className="row">
               {Array.from({ length: CELL_NUM_IN_ROW }).map((_, x) => {
                 const unitId = unitsCoordinates.get(`x${x}y${y}`);
-                return <Cell x={x} y={y} unitId={unitId}/>
+                return <Cell key={`cell.x${x}y${y}`} x={x} y={y} unitId={unitId} />;
               })}
             </div>
           ))}
         </div>
-        {state.actionMenu.isOpen && <ActionMenu />}
+        {uiState.isOpen && <ActionMenu />}
       </div>
+      {gameState.phase.type === "finished" && (
+        <GameOverOverlay winnerId={gameState.phase.winner} />
+      )}
     </>
-  )
-}
+  );
+};
 
-const ActionMenu = () => {
-  const { state: { units, actionMenu }, dispatch } = useContext(ActionContext);
-  const [isAttacking, setIsAttacking] = useState(false);
-
-  const targetUnitId = actionMenu.targetUnitId;
-  if (!targetUnitId) return <></>
-
-  const { spec, status } = loadUnit(targetUnitId, units);
-
+const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
+  const winner = getPlayer(winnerId, PLAYERS);
   return (
-    <div className="action-menu">
-      <button
-        className={actionMenu.activeActionOption === "MOVE"
-          ? "action-menu-btn action-menu-btn-active"
-          : "action-menu-btn"
-        }
-        onClick={() => {
-          setIsAttacking(false);
-          dispatch({
-            type: "SELECT_MOVE",
-            payload: { running_unit_id: spec.id }
-          });
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          color: "white",
+          fontSize: "3rem",
+          fontWeight: "bold",
+          textAlign: "center",
         }}
-        disabled={status.moved}
       >
-        移動
-      </button>
-      <button
-        className={isAttacking
-          ? "action-menu-btn action-menu-btn-selected"
-          : "action-menu-btn"
-        }
-        onClick={() => setIsAttacking(!isAttacking)}
-        disabled={status.attacked}
-      >
-        攻撃
-      </button>
-      {isAttacking && <div className="action-sub-menu">
-        {spec.armaments.map((armament, idx) => (
-          <>
-            <button
-              key={`action-sub-menu.${idx}`}
-              className={actionMenu.activeActionOption === "ATTACK" && actionMenu.selectedArmamentIdx === idx
-                ? "action-menu-btn action-menu-btn-active"
-                : "action-menu-btn"
-              }
-              onClick={() => dispatch({
-                type: "SELECT_ATTACK",
-                payload: {
-                  running_unit_id: spec.id,
-                  action: {
-                    target_unit_id: targetUnitId,
-                    armament_idx: idx,
-                  }
-                }
-              })}
-              disabled={status.attacked || armament.consumed_en > status.en}
-            >
-              {armament.name}
-            </button>
-            <span className="action-sub-menu-description">{`POW: ${armament.value} / EN: ${armament.consumed_en} / RANGE: ${armament.range}`}</span>
-          </>
-        ))}
-      </div>}
-      <p style={{ color: "gray"}}>{`----------------`}</p>
-      <button
-        className="action-menu-btn"
-        onClick={() => dispatch({ type: "TURN_END" })}
-      >
-        確定
-      </button>
-      <button
-        className="action-menu-btn"
-        onClick={() => dispatch({ type: "CLOSE_MENU" })}
-      >
-        閉じる
-      </button>
+        <p>{`Player ${winner.id} Wins!`}</p>
+        <p style={{ fontSize: "1.5rem" }}>{winner.name}</p>
+      </div>
     </div>
-  )
-}
+  );
+};

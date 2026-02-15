@@ -1,265 +1,56 @@
-import { Reducer } from "react";
-import { UnitType, OrientationType, StateType, ActionType, PayloadType, Player, PayloadMoveActionType, PayloadAttackActionType, ActionOptionType, StateActionMenuType } from "../../types";
-import { CELL_NUM_IN_ROW, PLAYERS, ROW_NUM } from "../../constants";
+import { ActionOptionType, PayloadAttackActionType, StateActionMenuType } from "../../types";
 
 export const INITIAL_ACTION_MENU: StateActionMenuType = {
   isOpen: false,
   targetUnitId: null,
   activeActionOption: null,
   selectedArmamentIdx: null,
-}
-
-export const calculateOrientation = (
-  current: { x: number, y: number },
-  previous: { x: number, y: number }
-): OrientationType => {
-  const diffX = current.x - previous.x;
-  const diffY = current.y - previous.y;
-  if (Math.abs(diffY) >= Math.abs(diffX)) {
-    return diffY > 0 ? "DOWN" : "UP";
-  } else {
-    return diffX > 0 ? "RIGHT" : "LEFT";
-  }
-}
-
-// Player
-export const getPlayer = (id: number, players: Player[]) => {
-  const idx = getIdxInPlayer(id, players);
-  return players[idx];
-}
-
-export const nextPlayer = (id: number, players: Player[]) => {
-  const idx = getIdxInPlayer(id, players);
-  const nextIdx = (idx + 1) % players.length;
-  return players[nextIdx];
-}
-
-const getIdxInPlayer = (id: number, players: Player[]) => {
-  const idx = players.findIndex((player) => player.id === id);
-  if (idx === -1) throw new Error(`Player not found: ${id}`);
-  return idx;
-}
-
-// Unit
-export const loadUnit = (
-  id: number,
-  units: UnitType[]
-): UnitType => {
-  const filtered = units.filter((unit) => unit.spec.id === id);
-  if (filtered.length === 0) throw new Error(`Unit not found: ${id}`);
-  if (filtered.length > 1) throw new Error(`Duplicate unit: ${id}`);
-  return filtered[0];
-}
-
-export const updateUnit = (
-  updatedUnit: UnitType,
-  previousUnits: UnitType[]
-): UnitType[] => {
-  const newUnits = previousUnits.map((previous) => {
-    if (previous.spec.id === updatedUnit.spec.id) {
-      return updatedUnit;
-    } else {
-      return previous;
-    }
-  });
-
-  return newUnits;
-}
-
-export const removeUnit = (
-  units: UnitType[],
-  targetId: number
-): UnitType[] => {
-  const remains = units.filter((unit) => unit.spec.id !== targetId);
-  return remains;
 };
 
-export const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
-  return 'x' in action && 'y' in action && !('target_unit_id' in action);
-}
+export type UIAction =
+  | { type: "OPEN_MENU"; unitId: number }
+  | { type: "CLOSE_MENU" }
+  | { type: "SELECT_MOVE" }
+  | { type: "SELECT_ATTACK"; payload: PayloadAttackActionType }
+  | { type: "RESET" }
 
-export const isPayloadAttackAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadAttackActionType => {
-  return 'target_unit_id' in action && 'armament_idx' in action;
-}
-
-export const reducer: Reducer<
-  StateType,
-  {
-    type: ActionType,
-    payload?: PayloadType
-  }
-> = (state, action) => {
-  const { type, payload } = action
-
-  if (type == "CLOSE_MENU") {
-    return {
-      ...state,
-      actionMenu: {
-        ...INITIAL_ACTION_MENU,
-        activeActionOption: nextActionOptionFromPayloadType(type),
-      }
-    }
-  }
-
-  if (type == "TURN_END") {
-    // recover executed status
-    const resettedUnits = state.units.map((unit) => {
-
-      // NOTE: recover en only for the active player
-      const en = unit.playerId == state.activePlayerId
-        ? Math.min(unit.status.en + unit.spec.max_en * 0.1, unit.spec.max_en)
-        : unit.status.en;
-
-      return {
-        ...unit,
-        status: {
-          ...unit.status,
-          en,
-          moved: false,
-          attacked: false,
-        }
-      }
-    })
-
-    return {
-      ...state,
-      actionMenu: {
-        ...INITIAL_ACTION_MENU,
-        activeActionOption: nextActionOptionFromPayloadType(type),
-      },
-      activePlayerId: nextPlayer(state.activePlayerId, PLAYERS).id,
-      units: resettedUnits
-    }
-  }
-
-  if (payload?.running_unit_id === undefined) return state;
-  const unit_in_action = loadUnit(payload.running_unit_id, state.units);
-
-  // Check if the unit_in_action is owned by the player
-  if (unit_in_action.playerId !== state.activePlayerId) return state;
-
-  if (type === "OPEN_MENU") {
-    return {
-      ...state,
-      actionMenu: {
-        isOpen: true,
-        targetUnitId: unit_in_action.spec.id,
-        activeActionOption: nextActionOptionFromPayloadType(type),
-        selectedArmamentIdx: null,
-      }
-    }
-  }
-
-  if (type === "SELECT_MOVE") {
-    return {
-      ...state,
-      actionMenu: {
-        isOpen: true,
-        targetUnitId: unit_in_action.spec.id,
-        activeActionOption: nextActionOptionFromPayloadType(type),
-        selectedArmamentIdx: null,
-      }
-    }
-  }
-
-  // Check if action exists
-  if (payload.action === undefined) return state;
-
-  switch (type) {
-    case "DO_MOVE": {
-      if (!isPayloadMoveAction(payload.action)) return state;
-      const newUnits = updateUnitsByMove(state.units, unit_in_action, payload.action);
-      return {
-        ...state,
-        actionMenu: {
-          ...INITIAL_ACTION_MENU,
-          activeActionOption: nextActionOptionFromPayloadType(type),
-        },
-        units: newUnits,
-      }
-    }
-    case "SELECT_ATTACK": {
-      if (!isPayloadAttackAction(payload.action)) return state;
-      return {
-        ...state,
-        actionMenu: {
-          isOpen: true,
-          targetUnitId: unit_in_action.spec.id,
-          activeActionOption: nextActionOptionFromPayloadType(type),
-          selectedArmamentIdx: payload.action.armament_idx,
-        }
-      }
-    }
-    case "DO_ATTACK": {
-      if (!isPayloadAttackAction(payload.action)) return state;
-      const newUnits = updateUnitsByAttack(state.units, unit_in_action, payload.action);
-      return {
-        ...state,
-        actionMenu: {
-          ...INITIAL_ACTION_MENU,
-          activeActionOption: nextActionOptionFromPayloadType(type),
-        },
-        units: newUnits,
-      }
-    }
-    default:
-      return state
-  }
-}
-
-const nextActionOptionFromPayloadType = (type: ActionType): ActionOptionType | null => {
+const nextActionOption = (type: UIAction["type"]): ActionOptionType | null => {
   if (type === "SELECT_MOVE") return "MOVE";
   if (type === "SELECT_ATTACK") return "ATTACK";
   return null;
-}
+};
 
-const updateUnitsByMove = (oldUnits: UnitType[], unit_in_action: UnitType, payloadAction: PayloadMoveActionType): UnitType[] => {
-  const { x, y } = payloadAction;
-  if (x < 0 || x >= CELL_NUM_IN_ROW || y < 0 || y >= ROW_NUM) return oldUnits;
-
-  const updatedUnit = {
-    ...unit_in_action,
-    status: {
-      ...unit_in_action.status,
-      previousCoordinate: unit_in_action.status.coordinate,
-      coordinate: { x, y },
-      moved: true,
-    }
+export const uiReducer = (
+  state: StateActionMenuType,
+  action: UIAction
+): StateActionMenuType => {
+  switch (action.type) {
+    case "OPEN_MENU":
+      return {
+        isOpen: true,
+        targetUnitId: action.unitId,
+        activeActionOption: null,
+        selectedArmamentIdx: null,
+      };
+    case "CLOSE_MENU":
+    case "RESET":
+      return {
+        ...INITIAL_ACTION_MENU,
+        activeActionOption: nextActionOption(action.type),
+      };
+    case "SELECT_MOVE":
+      return {
+        ...state,
+        activeActionOption: nextActionOption(action.type),
+        selectedArmamentIdx: null,
+      };
+    case "SELECT_ATTACK":
+      return {
+        ...state,
+        activeActionOption: nextActionOption(action.type),
+        selectedArmamentIdx: action.payload.armament_idx,
+      };
+    default:
+      return state;
   }
-  return updateUnit(updatedUnit, oldUnits);
-}
-
-const updateUnitsByAttack = (oldUnits: UnitType[], unit_in_action: UnitType, payloadAction: PayloadAttackActionType): UnitType[] => {
-  const armament = unit_in_action.spec.armaments[payloadAction.armament_idx];
-  if (armament.consumed_en > unit_in_action.status.en) return oldUnits;
-
-  const attacked = loadUnit(payloadAction.target_unit_id, oldUnits);
-  const remainHp = attacked.status.hp - armament.value;
-
-  // update for attacked
-  const newUnits = remainHp > 0
-    ? (() => {
-      const updatedUnit = {
-        ...attacked,
-        status: {
-          ...attacked.status,
-          hp: remainHp,
-        }
-      }
-      return updateUnit(updatedUnit, oldUnits);
-    })() : removeUnit(oldUnits, attacked.spec.id);
-
-  // update for attacking
-  const remainEn = unit_in_action.status.en - armament.consumed_en;
-
-  const updatedAttacking = {
-    ...unit_in_action,
-    status: {
-      ...unit_in_action.status,
-      en: remainEn,
-      moved: true, // NOTE: cannot move after an attack.
-      attacked: true,
-    }
-  }
-  return updateUnit(updatedAttacking, newUnits)
-}
+};

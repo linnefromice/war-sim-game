@@ -1,16 +1,27 @@
 import FighterJetIcon from "../../assets/fighterJet.svg?react";
 import ArmyTankIcon from "../../assets/armyTank.svg?react";
 import BattleSoldierIcon from "../../assets/battleSoldier.svg?react";
+import { UnitCategory } from "../../types";
 
-export const UnitIcon = ({ unitType, className }: { unitType: number, className: string }): JSX.Element => {
+function assertNever(x: never): never {
+  throw new Error(`Unexpected value: ${x}`);
+}
+
+export const UnitIcon = ({ unitType, className }: { unitType: UnitCategory, className: string }): JSX.Element => {
   const props = {
     width: 28,
     height: 28,
     className,
   }
 
-  if (unitType === 1) return <FighterJetIcon {...props} />
-  if (unitType === 2) return <ArmyTankIcon {...props} />
-  if (unitType === 3) return <BattleSoldierIcon {...props}/>
-  return <></>
+  switch (unitType) {
+    case "fighter":
+      return <FighterJetIcon {...props} />
+    case "tank":
+      return <ArmyTankIcon {...props} />
+    case "soldier":
+      return <BattleSoldierIcon {...props}/>
+    default:
+      return assertNever(unitType);
+  }
 }
