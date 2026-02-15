@@ -1,5 +1,8 @@
 import { Armament, Coordinate, Player, UnitType } from "../types";
 
+export const ROW_NUM = 10;
+export const CELL_NUM_IN_ROW = 13;
+
 const coordinates = (coordinate: Coordinate) => ({
   coordinate,
   previousCoordinate: coordinate,
