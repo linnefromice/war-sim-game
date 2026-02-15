@@ -37,9 +37,44 @@ export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, o
   return (
     <div
       className={cellClassName}
-      style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor: bgColor, position: "relative" }}
       onClick={onClick}
     >
+      {(status.moved || status.attacked) && (
+        <div style={{
+          position: "absolute",
+          top: "1px",
+          left: "1px",
+          display: "flex",
+          gap: "1px",
+          zIndex: 1,
+        }}>
+          {status.moved && (
+            <span style={{
+              fontSize: "0.5rem",
+              backgroundColor: "rgba(100, 100, 100, 0.7)",
+              color: "white",
+              padding: "0px 2px",
+              borderRadius: "2px",
+              lineHeight: 1.3,
+            }}>
+              移動済
+            </span>
+          )}
+          {status.attacked && (
+            <span style={{
+              fontSize: "0.5rem",
+              backgroundColor: "rgba(180, 0, 0, 0.7)",
+              color: "white",
+              padding: "0px 2px",
+              borderRadius: "2px",
+              lineHeight: 1.3,
+            }}>
+              攻撃済
+            </span>
+          )}
+        </div>
+      )}
       <div className="cell-content">
         <div className="cell-content-image">
           <UnitIcon
