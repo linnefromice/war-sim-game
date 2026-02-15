@@ -17,7 +17,7 @@ export const Cell = React.memo(({ x, y, unitId }: { x: number, y: number, unitId
       return <MoveModeCell x={x} y={y} unitId={unitId} targetUnitId={targetUnitId} />;
     }
     if (actionMenu.activeActionOption === "ATTACK") {
-      const selectedArmamentIdx = actionMenu.selectedArmamentIdx || 0;
+      const selectedArmamentIdx = actionMenu.selectedArmamentIdx ?? 0;
       return <AttackModeCell x={x} y={y} unitId={unitId} targetUnitId={targetUnitId} selectedArmamentIdx={selectedArmamentIdx} />;
     }
   }

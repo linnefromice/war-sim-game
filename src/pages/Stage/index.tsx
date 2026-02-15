@@ -136,7 +136,7 @@ const StageContent = () => {
             <div key={`row.${y}`} className="row">
               {Array.from({ length: CELL_NUM_IN_ROW }).map((_, x) => {
                 const unitId = unitsCoordinates.get(`x${x}y${y}`);
-                return <Cell x={x} y={y} unitId={unitId} />;
+                return <Cell key={`cell.x${x}y${y}`} x={x} y={y} unitId={unitId} />;
               })}
             </div>
           ))}
