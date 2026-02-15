@@ -125,11 +125,45 @@ const StageContent = () => {
 
   const activePlayer = getPlayer(gameState.activePlayerId, tutorialScenario.players);
 
+  const player1Units = gameState.units.filter(u => u.playerId === 1);
+  const player2Units = gameState.units.filter(u => u.playerId === 2);
+
   return (
     <>
-      <div className="player-info">
-        <p>{`ID: ${activePlayer.id}`}</p>
-        <p>{`name: ${activePlayer.name}`}</p>
+      <div className="player-info" style={{
+        backgroundColor: `rgba(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]}, 0.15)`,
+        border: `2px solid rgba(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]}, 0.5)`,
+        borderRadius: "8px",
+        padding: "8px 16px",
+        marginBottom: "8px",
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+          <div>
+            <span style={{
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+              color: `rgb(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]})`,
+            }}>
+              ▶ {activePlayer.name}
+            </span>
+            <span style={{ color: "gray", marginLeft: "8px", fontSize: "0.9rem" }}>
+              のターン
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: "16px", fontSize: "0.85rem" }}>
+            <span style={{
+              color: `rgb(${tutorialScenario.players[0].rgb[0]}, ${tutorialScenario.players[0].rgb[1]}, ${tutorialScenario.players[0].rgb[2]})`,
+            }}>
+              {tutorialScenario.players[0].name}: {player1Units.length}体
+            </span>
+            <span style={{ color: "gray" }}>vs</span>
+            <span style={{
+              color: `rgb(${tutorialScenario.players[1].rgb[0]}, ${tutorialScenario.players[1].rgb[1]}, ${tutorialScenario.players[1].rgb[2]})`,
+            }}>
+              {tutorialScenario.players[1].name}: {player2Units.length}体
+            </span>
+          </div>
+        </div>
       </div>
       <div className="play-area">
         <div className="stage">

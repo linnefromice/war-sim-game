@@ -211,8 +211,8 @@ describe("Stage component tests (full scenario)", () => {
     const { container } = rtlRender(<Stage />);
 
     // Initially Player 1 is active
-    expect(screen.getByText("ID: 1")).toBeInTheDocument();
-    expect(screen.getByText("name: Hero")).toBeInTheDocument();
+    expect(screen.getByText(/▶ Hero/)).toBeInTheDocument();
+    expect(screen.getByText("のターン")).toBeInTheDocument();
 
     const stage = getStage(container);
     const rows = stage.querySelectorAll(".row");
@@ -226,8 +226,8 @@ describe("Stage component tests (full scenario)", () => {
     await user.click(screen.getByText("確定"));
 
     // Player should switch to Player 2
-    expect(screen.getByText("ID: 2")).toBeInTheDocument();
-    expect(screen.getByText("name: Villan")).toBeInTheDocument();
+    expect(screen.getByText(/▶ Villan/)).toBeInTheDocument();
+    expect(screen.getByText("のターン")).toBeInTheDocument();
   });
 });
 
