@@ -26,6 +26,7 @@ export const ActionContext = createContext<{
   gameState: GameState;
   uiState: StateActionMenuType;
   dispatch: (action: { type: ActionType; payload?: PayloadType }) => void;
+  onRestart?: () => void;
 }>({
   gameState: initialGameState,
   uiState: INITIAL_ACTION_MENU,
@@ -33,7 +34,7 @@ export const ActionContext = createContext<{
   dispatch: (_: { type: ActionType; payload?: PayloadType }) => {},
 });
 
-export const Stage = () => {
+export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
   const [gameState, gameDispatch] = useReducer(gameReducer, initialGameState);
   const [uiState, uiDispatch] = useReducer(uiReducer, INITIAL_ACTION_MENU);
 
@@ -99,7 +100,7 @@ export const Stage = () => {
   };
 
   return (
-    <ActionContext.Provider value={{ gameState, uiState, dispatch }}>
+    <ActionContext.Provider value={{ gameState, uiState, dispatch, onRestart }}>
       <StageContent />
     </ActionContext.Provider>
   );
@@ -152,6 +153,7 @@ const StageContent = () => {
 
 const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
   const winner = getPlayer(winnerId, tutorialScenario.players);
+  const { onRestart } = useContext(ActionContext);
   return (
     <div
       style={{
@@ -177,6 +179,29 @@ const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
       >
         <p>{`Player ${winner.id} Wins!`}</p>
         <p style={{ fontSize: "1.5rem" }}>{winner.name}</p>
+        <button
+          onClick={onRestart}
+          style={{
+            marginTop: "2rem",
+            padding: "1rem 2rem",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            color: "white",
+            backgroundColor: "transparent",
+            border: "2px solid white",
+            borderRadius: "0.5rem",
+            cursor: "pointer",
+            transition: "background-color 0.3s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }}
+        >
+          Restart
+        </button>
       </div>
     </div>
   );
