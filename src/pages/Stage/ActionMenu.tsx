@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
 
@@ -48,9 +48,8 @@ export const ActionMenu = () => {
       {isAttacking && (
         <div className="action-sub-menu">
           {spec.armaments.map((armament, idx) => (
-            <>
+            <React.Fragment key={`action-sub-menu.${idx}`}>
               <button
-                key={`action-sub-menu.${idx}`}
                 className={
                   actionMenu.activeActionOption === "ATTACK" &&
                   actionMenu.selectedArmamentIdx === idx
@@ -74,7 +73,7 @@ export const ActionMenu = () => {
                 {armament.name}
               </button>
               <span className="action-sub-menu-description">{`POW: ${armament.value} / EN: ${armament.consumed_en} / RANGE: ${armament.range}`}</span>
-            </>
+            </React.Fragment>
           ))}
         </div>
       )}

@@ -12,11 +12,6 @@ export type UnitCategory = "fighter" | "tank" | "soldier"
 // State
 export type UnitType = { spec: UnitSpecType, status: UnitStatusType, playerId: number }
 
-export type StateType = {
-  activePlayerId: number
-  actionMenu: StateActionMenuType
-  units: UnitType[]
-}
 export type StateActionMenuType = {
   isOpen: boolean
   targetUnitId: number | null
