@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { ActionContext } from ".";
 import { calculateOrientation, getPlayer, loadUnit } from "../../game/gameReducer";
 import { UnitIcon } from "./UnitIcon";
-import { PLAYERS } from "../../constants";
+import { tutorialScenario } from "../../scenarios/tutorial";
 
 const statusColor = (current: number, max: number): string => {
   if (current === max) return "#93C572"; // pistachio
@@ -13,7 +13,7 @@ const statusColor = (current: number, max: number): string => {
 export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, onClick: () => void }) => {
   const { gameState: { units }, uiState: actionMenu } = useContext(ActionContext);
   const { spec, status, playerId } = loadUnit(unitId, units);
-  const { rgb } = getPlayer(playerId, PLAYERS);
+  const { rgb } = getPlayer(playerId, tutorialScenario.players);
 
   const orientation = calculateOrientation(
     status.coordinate,

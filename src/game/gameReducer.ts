@@ -1,5 +1,5 @@
 import { UnitType, OrientationType, Player, PayloadMoveActionType, PayloadAttackActionType } from "../types";
-import { CELL_NUM_IN_ROW, PLAYERS, ROW_NUM } from "../constants";
+import { tutorialScenario } from "../scenarios/tutorial";
 import { GameState, GameAction } from "./types";
 
 // --- Type Guards ---
@@ -77,7 +77,7 @@ const updateUnitsByMove = (
   payloadAction: PayloadMoveActionType
 ): UnitType[] => {
   const { x, y } = payloadAction;
-  if (x < 0 || x >= CELL_NUM_IN_ROW || y < 0 || y >= ROW_NUM) return oldUnits;
+  if (x < 0 || x >= tutorialScenario.gridSize.cols || y < 0 || y >= tutorialScenario.gridSize.rows) return oldUnits;
 
   const updatedUnit = {
     ...unitInAction,
@@ -164,7 +164,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         };
       });
 
-      const nextPlayerId = nextPlayer(state.activePlayerId, PLAYERS).id;
+      const nextPlayerId = nextPlayer(state.activePlayerId, tutorialScenario.players).id;
       const nextPlayerUnits = resettedUnits.filter((u) => u.playerId === nextPlayerId);
 
       if (nextPlayerUnits.length === 0) {

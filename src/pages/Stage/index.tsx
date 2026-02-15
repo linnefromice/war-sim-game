@@ -3,7 +3,7 @@ import "./Stage.scss"
 import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
 import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
-import { CELL_NUM_IN_ROW, INITIAL_UNITS, PLAYERS, ROW_NUM } from "../../constants";
+import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState } from "../../game/types";
 import { gameReducer, getPlayer, loadUnit } from "../../game/gameReducer";
 import { ActionMenu } from "./ActionMenu";
@@ -18,7 +18,7 @@ const isPayloadAttackAction = (action: PayloadMoveActionType | PayloadAttackActi
 
 const initialGameState: GameState = {
   activePlayerId: 1,
-  units: INITIAL_UNITS,
+  units: tutorialScenario.units,
   phase: { type: "playing" },
 };
 
@@ -122,7 +122,7 @@ const StageContent = () => {
     }, new Map<string, number>());
   }, [gameState.units]);
 
-  const activePlayer = getPlayer(gameState.activePlayerId, PLAYERS);
+  const activePlayer = getPlayer(gameState.activePlayerId, tutorialScenario.players);
 
   return (
     <>
@@ -132,9 +132,9 @@ const StageContent = () => {
       </div>
       <div className="play-area">
         <div className="stage">
-          {Array.from({ length: ROW_NUM }).map((_, y) => (
+          {Array.from({ length: tutorialScenario.gridSize.rows }).map((_, y) => (
             <div key={`row.${y}`} className="row">
-              {Array.from({ length: CELL_NUM_IN_ROW }).map((_, x) => {
+              {Array.from({ length: tutorialScenario.gridSize.cols }).map((_, x) => {
                 const unitId = unitsCoordinates.get(`x${x}y${y}`);
                 return <Cell key={`cell.x${x}y${y}`} x={x} y={y} unitId={unitId} />;
               })}
@@ -151,7 +151,7 @@ const StageContent = () => {
 };
 
 const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
-  const winner = getPlayer(winnerId, PLAYERS);
+  const winner = getPlayer(winnerId, tutorialScenario.players);
   return (
     <div
       style={{
