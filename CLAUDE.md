@@ -68,6 +68,31 @@ Unit icons imported as React components via `vite-plugin-svgr` using `?react` su
 
 Action menu labels are in Japanese: 移動 (Move), 攻撃 (Attack), 確定 (End Turn), 閉じる (Close).
 
+## Claude Code Configuration (`.claude/`)
+
+### Agents
+
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| `planner` | Implementation planning | Complex features (3+ steps), multi-file changes |
+| `code-reviewer` | Code review | After 10+ line changes, before PR creation |
+| `qa-specialist` | Test strategy | Test design, coverage analysis |
+| `refactor-cleaner` | Dead code cleanup | Unused code removal, deduplication |
+
+### Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/check` | Run `yarn lint` → `yarn build` → `yarn test` sequentially |
+| `/ship` | Quality checks → commit → push → PR creation (one-command deploy) |
+
+### Rules
+
+| Rule | Purpose |
+|------|---------|
+| `task-completion` | Checklist: lint → build → test → commit → PR before marking task done |
+| `git-workflow` | Conventional Commits format, branch naming, implementation order |
+
 ## Improvement Plan
 
 `IMPROVEMENT_PLAN.md` contains the full roadmap with prioritized phases. Key remaining items: component performance optimization, additional scenarios, AI opponents.
