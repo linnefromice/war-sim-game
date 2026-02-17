@@ -1,6 +1,7 @@
-import { screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { MOVE_DURATION, ATTACK_DURATION } from "./AnimationLayer";
 
 // Mock UnitIcon to avoid SVG import issues in test environment
 vi.mock("./UnitIcon", () => ({
@@ -17,7 +18,12 @@ describe("Stage component tests (full scenario)", () => {
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     user = userEvent.setup();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   // Test 1: Unit selection → action menu display
@@ -80,6 +86,11 @@ describe("Stage component tests (full scenario)", () => {
     // Click on a move-range cell to execute movement
     await user.click(moveRangeCells[0]);
 
+    // Complete move animation
+    await act(() => {
+      vi.advanceTimersByTime(MOVE_DURATION);
+    });
+
     // After movement, the action menu should close (no 移動 button visible)
     expect(screen.queryByText("移動")).not.toBeInTheDocument();
 
@@ -130,6 +141,11 @@ describe("Stage component tests (full scenario)", () => {
       // Fallback: just click any move range cell
       await user.click(moveRangeCells[0]);
     }
+
+    // Complete move animation
+    await act(() => {
+      vi.advanceTimersByTime(MOVE_DURATION);
+    });
 
     // Step 2: Now click the moved unit again (it's now at a new position)
     // Find the unit that just moved - it should have moved=true so it's grayed out
@@ -193,8 +209,12 @@ describe("Stage component tests (full scenario)", () => {
       for (const uc of allUnitCells) {
         // Try clicking unit cells - if one is in range, the attack will execute
         await user.click(uc);
-        // If menu closed, attack happened
+        // If menu closed, attack animation started
         if (!screen.queryByText("Machine gun")) {
+          // Complete attack animation
+          await act(() => {
+            vi.advanceTimersByTime(ATTACK_DURATION);
+          });
           attacked = true;
           break;
         }
@@ -230,4 +250,3 @@ describe("Stage component tests (full scenario)", () => {
     expect(screen.getByText("のターン")).toBeInTheDocument();
   });
 });
-

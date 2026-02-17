@@ -4,7 +4,7 @@ export type ActionOptionType = typeof ACTION_OPTIONS[number]
 const ORIENTATIONS = ["UP", "DOWN", "LEFT", "RIGHT"] as const
 export type OrientationType = typeof ORIENTATIONS[number]
 
-const ACTIONS = ["OPEN_MENU", "CLOSE_MENU", "TURN_END", "SELECT_MOVE", "SELECT_ATTACK", "DO_MOVE", "DO_ATTACK"] as const
+const ACTIONS = ["OPEN_MENU", "CLOSE_MENU", "TURN_END", "SELECT_MOVE", "SELECT_ATTACK", "DO_MOVE", "DO_ATTACK", "ANIMATION_START_MOVE", "ANIMATION_START_ATTACK", "ANIMATION_COMPLETE"] as const
 export type ActionType = typeof ACTIONS[number];
 
 export type UnitCategory = "fighter" | "tank" | "soldier"
@@ -12,11 +12,17 @@ export type UnitCategory = "fighter" | "tank" | "soldier"
 // State
 export type UnitType = { spec: UnitSpecType, status: UnitStatusType, playerId: number }
 
+export type AnimationState =
+  | { type: "idle" }
+  | { type: "move"; unitId: number; from: Coordinate; to: Coordinate }
+  | { type: "attack"; targetId: number; damage: number; destroyed: boolean }
+
 export type StateActionMenuType = {
   isOpen: boolean
   targetUnitId: number | null
   activeActionOption: ActionOptionType | null
   selectedArmamentIdx: number | null // temp: only for SELECT_ATTACK
+  animationState: AnimationState
 }
 
 export type PayloadType = {

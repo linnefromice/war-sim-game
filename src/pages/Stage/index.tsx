@@ -1,12 +1,13 @@
-import { createContext, useContext, useMemo, useReducer } from "react";
+import { createContext, useContext, useMemo, useReducer, useRef } from "react";
 import "./Stage.scss"
 import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
 import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
-import { GameState } from "../../game/types";
+import { GameState, GameAction } from "../../game/types";
 import { gameReducer, getPlayer, loadUnit } from "../../game/gameReducer";
 import { ActionMenu } from "./ActionMenu";
+import { AnimationLayer } from "./AnimationLayer";
 
 const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
   return 'x' in action && 'y' in action && !('target_unit_id' in action);
@@ -37,9 +38,13 @@ export const ActionContext = createContext<{
 export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
   const [gameState, gameDispatch] = useReducer(gameReducer, initialGameState);
   const [uiState, uiDispatch] = useReducer(uiReducer, INITIAL_ACTION_MENU);
+  const pendingGameAction = useRef<GameAction | null>(null);
 
   const dispatch = (action: { type: ActionType; payload?: PayloadType }) => {
     const { type, payload } = action;
+
+    // Block all actions during animation except ANIMATION_COMPLETE
+    if (uiState.animationState.type !== "idle" && type !== "ANIMATION_COMPLETE") return;
 
     switch (type) {
       case "OPEN_MENU": {
@@ -72,24 +77,40 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
         if (payload?.running_unit_id === undefined) return;
         if (payload.action === undefined) return;
         if (!isPayloadMoveAction(payload.action)) return;
-        gameDispatch({
+        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        const from = unit.status.coordinate;
+        const to = { x: payload.action.x, y: payload.action.y };
+        uiDispatch({ type: "ANIMATION_START_MOVE", unitId: payload.running_unit_id, from, to });
+        pendingGameAction.current = {
           type: "DO_MOVE",
           unitId: payload.running_unit_id,
           payload: payload.action,
-        });
-        uiDispatch({ type: "RESET" });
+        };
         break;
       }
       case "DO_ATTACK": {
         if (payload?.running_unit_id === undefined) return;
         if (payload.action === undefined) return;
         if (!isPayloadAttackAction(payload.action)) return;
-        gameDispatch({
+        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        const target = loadUnit(payload.action.target_unit_id, gameState.units);
+        const armament = unit.spec.armaments[payload.action.armament_idx];
+        const damage = armament.value;
+        const destroyed = target.status.hp - damage <= 0;
+        uiDispatch({ type: "ANIMATION_START_ATTACK", targetId: payload.action.target_unit_id, damage, destroyed });
+        pendingGameAction.current = {
           type: "DO_ATTACK",
           unitId: payload.running_unit_id,
           payload: payload.action,
-        });
-        uiDispatch({ type: "RESET" });
+        };
+        break;
+      }
+      case "ANIMATION_COMPLETE": {
+        if (pendingGameAction.current) {
+          gameDispatch(pendingGameAction.current);
+          pendingGameAction.current = null;
+        }
+        uiDispatch({ type: "ANIMATION_COMPLETE" });
         break;
       }
       case "TURN_END":
@@ -110,7 +131,10 @@ const StageContent = () => {
   const { gameState, uiState } = useContext(ActionContext);
 
   const unitsCoordinates = useMemo(() => {
+    // Hide moving unit from grid during move animation (AnimationLayer renders it)
+    const animatingUnitId = uiState.animationState.type === "move" ? uiState.animationState.unitId : null;
     return gameState.units.reduce((map, unit) => {
+      if (unit.spec.id === animatingUnitId) return map;
       const { x, y } = unit.status.coordinate;
       const mapKey = `x${x}y${y}`;
       if (map.has(mapKey)) {
@@ -121,7 +145,7 @@ const StageContent = () => {
       map.set(mapKey, unit.spec.id);
       return map;
     }, new Map<string, number>());
-  }, [gameState.units]);
+  }, [gameState.units, uiState.animationState]);
 
   const activePlayer = getPlayer(gameState.activePlayerId, tutorialScenario.players);
 
@@ -165,7 +189,7 @@ const StageContent = () => {
           </div>
         </div>
       </div>
-      <div className="play-area">
+      <div className="play-area" style={{ position: "relative" }}>
         <div className="stage">
           {Array.from({ length: tutorialScenario.gridSize.rows }).map((_, y) => (
             <div key={`row.${y}`} className="row">
@@ -176,6 +200,7 @@ const StageContent = () => {
             </div>
           ))}
         </div>
+        <AnimationLayer />
         {uiState.isOpen && <ActionMenu />}
       </div>
       {gameState.phase.type === "finished" && (

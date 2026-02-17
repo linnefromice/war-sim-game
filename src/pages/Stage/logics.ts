@@ -1,10 +1,11 @@
-import { ActionOptionType, PayloadAttackActionType, StateActionMenuType } from "../../types";
+import { ActionOptionType, Coordinate, PayloadAttackActionType, StateActionMenuType } from "../../types";
 
 export const INITIAL_ACTION_MENU: StateActionMenuType = {
   isOpen: false,
   targetUnitId: null,
   activeActionOption: null,
   selectedArmamentIdx: null,
+  animationState: { type: "idle" },
 };
 
 export type UIAction =
@@ -13,6 +14,9 @@ export type UIAction =
   | { type: "SELECT_MOVE" }
   | { type: "SELECT_ATTACK"; payload: PayloadAttackActionType }
   | { type: "RESET" }
+  | { type: "ANIMATION_START_MOVE"; unitId: number; from: Coordinate; to: Coordinate }
+  | { type: "ANIMATION_START_ATTACK"; targetId: number; damage: number; destroyed: boolean }
+  | { type: "ANIMATION_COMPLETE" }
 
 const nextActionOption = (type: UIAction["type"]): ActionOptionType | null => {
   if (type === "SELECT_MOVE") return "MOVE";
@@ -24,9 +28,15 @@ export const uiReducer = (
   state: StateActionMenuType,
   action: UIAction
 ): StateActionMenuType => {
+  // Block all actions during animation except ANIMATION_COMPLETE
+  if (state.animationState.type !== "idle" && action.type !== "ANIMATION_COMPLETE") {
+    return state;
+  }
+
   switch (action.type) {
     case "OPEN_MENU":
       return {
+        ...INITIAL_ACTION_MENU,
         isOpen: true,
         targetUnitId: action.unitId,
         activeActionOption: null,
@@ -49,6 +59,21 @@ export const uiReducer = (
         ...state,
         activeActionOption: nextActionOption(action.type),
         selectedArmamentIdx: action.payload.armament_idx,
+      };
+    case "ANIMATION_START_MOVE":
+      return {
+        ...INITIAL_ACTION_MENU,
+        animationState: { type: "move", unitId: action.unitId, from: action.from, to: action.to },
+      };
+    case "ANIMATION_START_ATTACK":
+      return {
+        ...INITIAL_ACTION_MENU,
+        animationState: { type: "attack", targetId: action.targetId, damage: action.damage, destroyed: action.destroyed },
+      };
+    case "ANIMATION_COMPLETE":
+      return {
+        ...state,
+        animationState: { type: "idle" },
       };
     default:
       return state;
