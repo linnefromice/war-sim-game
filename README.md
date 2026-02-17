@@ -1,6 +1,10 @@
 # War Simulation Game
 
+[![Deploy](https://img.shields.io/badge/Play-war--sim--game.pages.dev-blue)](https://war-sim-game.pages.dev)
+
 ターン制の戦争シミュレーションゲーム。2人のプレイヤーがグリッド上で軍事ユニットを操作し、相手の全ユニットを撃破すると勝利。
+
+**デプロイ先**: https://war-sim-game.pages.dev
 
 ## ゲーム内容
 
