@@ -1,6 +1,7 @@
-import { screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { ATTACK_DURATION } from "./AnimationLayer";
 
 // Mock UnitIcon to avoid SVG import issues
 vi.mock("./UnitIcon", () => ({
@@ -81,10 +82,20 @@ vi.mock("../../scenarios/tutorial", () => {
 
 // Test 5: Win detection → result screen
 describe("Stage win detection", () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    user = userEvent.setup();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("shows victory screen when all enemy units are eliminated", async () => {
     const { Stage } = await import("./index");
     const { render } = await import("@testing-library/react");
-    const user = userEvent.setup();
 
     const { container } = render(<Stage />);
 
@@ -117,6 +128,11 @@ describe("Stage win detection", () => {
     const enemyUnitCells = row1.querySelectorAll('.cell-unit, .cell-active-unit');
     expect(enemyUnitCells.length).toBe(1);
     await user.click(enemyUnitCells[0]);
+
+    // Complete attack animation
+    await act(() => {
+      vi.advanceTimersByTime(ATTACK_DURATION);
+    });
 
     // Enemy eliminated (100 HP - 400 Missile dmg = dead)
     // Open menu again on P1 unit to end turn
