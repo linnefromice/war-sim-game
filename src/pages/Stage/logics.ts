@@ -16,6 +16,7 @@ export type UIAction =
   | { type: "RESET" }
   | { type: "ANIMATION_START_MOVE"; unitId: number; from: Coordinate; to: Coordinate }
   | { type: "ANIMATION_START_ATTACK"; targetId: number; damage: number; destroyed: boolean }
+  | { type: "ANIMATION_START_TURN_CHANGE"; nextPlayerId: number }
   | { type: "ANIMATION_COMPLETE" }
 
 const nextActionOption = (type: UIAction["type"]): ActionOptionType | null => {
@@ -69,6 +70,15 @@ export const uiReducer = (
       return {
         ...INITIAL_ACTION_MENU,
         animationState: { type: "attack", targetId: action.targetId, damage: action.damage, destroyed: action.destroyed },
+      };
+    case "ANIMATION_START_TURN_CHANGE":
+      return {
+        ...state,
+        isOpen: false,
+        targetUnitId: null,
+        activeActionOption: null,
+        selectedArmamentIdx: null,
+        animationState: { type: "turn_change", nextPlayerId: action.nextPlayerId },
       };
     case "ANIMATION_COMPLETE":
       return {

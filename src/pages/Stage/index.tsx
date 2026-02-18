@@ -5,7 +5,7 @@ import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState, GameAction } from "../../game/types";
-import { gameReducer, getPlayer, loadUnit } from "../../game/gameReducer";
+import { gameReducer, getPlayer, loadUnit, nextPlayer } from "../../game/gameReducer";
 import { ActionMenu } from "./ActionMenu";
 import { AnimationLayer } from "./AnimationLayer";
 
@@ -107,16 +107,22 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
       }
       case "ANIMATION_COMPLETE": {
         if (pendingGameAction.current) {
-          gameDispatch(pendingGameAction.current);
+          const action = pendingGameAction.current;
+          gameDispatch(action);
           pendingGameAction.current = null;
+          if (action.type === "TURN_END") {
+            uiDispatch({ type: "RESET" });
+          }
         }
         uiDispatch({ type: "ANIMATION_COMPLETE" });
         break;
       }
-      case "TURN_END":
-        gameDispatch({ type: "TURN_END" });
-        uiDispatch({ type: "RESET" });
+      case "TURN_END": {
+        const nextPlayerId = nextPlayer(gameState.activePlayerId, tutorialScenario.players).id;
+        uiDispatch({ type: "ANIMATION_START_TURN_CHANGE", nextPlayerId });
+        pendingGameAction.current = { type: "TURN_END" };
         break;
+      }
     }
   };
 

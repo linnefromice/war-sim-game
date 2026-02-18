@@ -1,7 +1,7 @@
 import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ATTACK_DURATION } from "./AnimationLayer";
+import { ATTACK_DURATION, TURN_CHANGE_DURATION } from "./AnimationLayer";
 
 // Mock UnitIcon to avoid SVG import issues
 vi.mock("./UnitIcon", () => ({
@@ -142,6 +142,11 @@ describe("Stage win detection", () => {
 
     // Click 確定 to end turn → triggers win detection (no P2 units left)
     await user.click(screen.getByText("確定"));
+
+    // Complete turn change animation
+    await act(() => {
+      vi.advanceTimersByTime(TURN_CHANGE_DURATION);
+    });
 
     // Victory screen should show
     expect(screen.getByText("Player 1 Wins!")).toBeInTheDocument();

@@ -4,10 +4,11 @@ import { calculateOrientation, getPlayer, loadUnit } from "../../game/gameReduce
 import { UnitIcon } from "./UnitIcon";
 import { tutorialScenario } from "../../scenarios/tutorial";
 
-const statusColor = (current: number, max: number): string => {
-  if (current === max) return "#93C572"; // pistachio
-  if (current <= max * 0.5) return "#FFAA33"; // yellow orange
-  return "";
+const hpBarColor = (current: number, max: number): string => {
+  const ratio = current / max;
+  if (ratio > 0.5) return "#4CAF50";
+  if (ratio > 0.25) return "#FF9800";
+  return "#F44336";
 };
 
 export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, onClick: () => void }) => {
@@ -20,12 +21,18 @@ export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, o
     status.previousCoordinate
   );
 
-  const cellClassName = actionMenu.targetUnitId === unitId
-    ? "cell cell-active-unit"
-    : "cell cell-unit";
-  const bgColor = status.moved && status.attacked
+  const isExhausted = status.moved && status.attacked;
+  const isActive = actionMenu.targetUnitId === unitId;
+
+  const cellClassNames = [
+    "cell",
+    isActive ? "cell-active-unit" : "cell-unit",
+    isExhausted ? "cell-exhausted" : "",
+  ].filter(Boolean).join(" ");
+
+  const bgColor = isExhausted
     ? "rgba(0, 0, 0, 0.125)"
-    : actionMenu.targetUnitId === unitId
+    : isActive
       ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.375)`
       : `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.125)`;
 
@@ -34,13 +41,16 @@ export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, o
   if (orientation === "DOWN") cellContentClassForOrientation = "rotate-180";
   if (orientation === "LEFT") cellContentClassForOrientation = "rotate-270";
 
+  const hpRatio = (status.hp / spec.max_hp) * 100;
+  const enRatio = (status.en / spec.max_en) * 100;
+
   return (
     <div
-      className={cellClassName}
+      className={cellClassNames}
       style={{ backgroundColor: bgColor, position: "relative" }}
       onClick={onClick}
     >
-      {(status.moved || status.attacked) && (
+      {!isExhausted && (status.moved || status.attacked) && (
         <div style={{
           position: "absolute",
           top: "1px",
@@ -82,24 +92,24 @@ export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, o
             className={cellContentClassForOrientation}
           />
         </div>
-        <div className="cell-content-text">
-          <div>
-            <span
-              className="cell-unit-status-sm"
-              style={{ color: statusColor(status.hp, spec.max_hp) }}
-            >
-              {status.hp}
-            </span>
-            <span className="cell-unit-status-xs" style={{ color: "gray" }}>{`/${spec.max_hp}`}</span>
+        <div className="stat-bars">
+          <div className="stat-bar">
+            <div
+              className="stat-bar-fill"
+              style={{
+                width: `${hpRatio}%`,
+                backgroundColor: hpBarColor(status.hp, spec.max_hp),
+              }}
+            />
           </div>
-          <div>
-            <span
-              className="cell-unit-status-sm"
-              style={{ color: statusColor(status.en, spec.max_en) }}
-            >
-              {status.en}
-            </span>
-            <span className="cell-unit-status-xs" style={{ color: "gray" }}>{`/${spec.max_en}`}</span>
+          <div className="stat-bar">
+            <div
+              className="stat-bar-fill"
+              style={{
+                width: `${enRatio}%`,
+                backgroundColor: "#2196F3",
+              }}
+            />
           </div>
         </div>
       </div>

@@ -21,6 +21,29 @@
 
 .stage {
   margin: 4px;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+  padding: 12px;
+  border-radius: 12px;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.015) 2px,
+      rgba(255, 255, 255, 0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 .row {
@@ -35,15 +58,29 @@
   height: 64px;
   width: 64px;
   border-radius: 8px;
-  background-color: whitesmoke;
-  border: 1px solid silver;
+  background-color: rgba(30, 30, 50, 0.8);
+  border: 1px solid rgba(100, 100, 255, 0.15);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, box-shadow 0.1s;
+  position: relative;
+  z-index: 1;
 
   &-unit {
     background-color: rgba(255, 0, 0, 0.125); // override by player's color
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3), 0 0 6px rgba(200, 200, 255, 0.3);
+    }
   }
 
   &-active-unit {
     background-color: rgba(255, 0, 0, 0.375); // override by player's color
+  }
+
+  &-exhausted {
+    filter: grayscale(0.7);
+    opacity: 0.5;
   }
 
   &-unit-status-md {
@@ -59,11 +96,27 @@
   }
 
   &-move-range {
-    background-color: royalblue;
+    background: rgba(65, 105, 225, 0.4);
+    border: 1px solid rgba(100, 150, 255, 0.6);
+    cursor: pointer;
+    animation: pulse-blue 1.5s ease-in-out infinite;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3), 0 0 12px rgba(65, 105, 225, 0.6), 0 0 20px rgba(65, 105, 225, 0.3);
+    }
   }
 
   &-attack-range {
-    background-color: lightcoral;
+    background: rgba(255, 60, 60, 0.4);
+    border: 1px solid rgba(255, 100, 100, 0.6);
+    cursor: crosshair;
+    animation: pulse-red 1.5s ease-in-out infinite;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3), 0 0 12px rgba(255, 60, 60, 0.6), 0 0 20px rgba(255, 60, 60, 0.3);
+    }
   }
 
   &-content {
@@ -76,64 +129,263 @@
 
     &-image {
       flex-grow: 1;
-    }
-
-    &-text {
       display: flex;
-      justify-content: center;
       align-items: center;
-      flex-direction: column;
-
-      div {
-        line-height: 0.75rem;
-      }
+      justify-content: center;
     }
+  }
+}
+
+.stat-bars {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 4px 3px;
+
+  .stat-bar {
+    width: 100%;
+    height: 3px;
+    background-color: rgba(60, 60, 60, 0.8);
+    border-radius: 1px;
+    overflow: hidden;
+
+    &-fill {
+      height: 100%;
+      border-radius: 1px;
+      transition: width 0.2s ease;
+    }
+  }
+}
+
+// Action Menu - Floating card near selected unit
+@keyframes action-menu-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .action {
   &-menu {
+    position: absolute;
+    z-index: 100;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+    gap: 4px;
+    min-width: 200px;
+    padding: 12px;
+    background: rgba(20, 20, 35, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    animation: action-menu-fade-in 150ms ease-out;
 
+    // Unit summary header
+    &-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 4px;
+
+      &-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: 0.3px;
+      }
+
+      &-bars {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      &-stat {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+
+        &-label {
+          font-weight: 600;
+          min-width: 20px;
+        }
+
+        &-bar {
+          width: 60px;
+          height: 6px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+          overflow: hidden;
+
+          &-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 200ms ease;
+
+            &--hp {
+              background: linear-gradient(90deg, #22c55e, #4ade80);
+            }
+
+            &--en {
+              background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            }
+          }
+        }
+
+        &-value {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 10px;
+          min-width: 50px;
+        }
+      }
+    }
+
+    // Base button style
     &-btn {
-      width: 108px;
-      margin: 4px;
-      padding: 8px 16px;
-      background-color: #808080; // gray
-      border: 2px solid #acacac; // light gray
-      border-radius: 4px;
+      width: 100%;
+      margin: 0;
+      padding: 8px 14px;
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
       color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease, transform 80ms ease;
+      text-align: left;
 
-      &-active {
-        background-color: #0000ff; // blue
-        border: 2px solid #52bdff; // light blue
+      &:hover:not(:disabled) {
+        background-color: rgba(255, 255, 255, 0.14);
+        border-color: rgba(255, 255, 255, 0.2);
       }
 
-      &-selected {
-        background-color: #B2B2FF;
-        border: 2px solid #e5e5ff; // lavender
+      &:active:not(:disabled) {
+        transform: scale(0.98);
       }
 
+      // Move button active state - blue
+      &-move-active {
+        background-color: rgba(65, 105, 225, 0.35);
+        border-color: #4169E1;
+        color: #93b4ff;
+      }
+
+      // Attack button toggled state - red-ish
+      &-attack-selected {
+        background-color: rgba(220, 53, 69, 0.3);
+        border-color: #DC3545;
+        color: #ff8a95;
+      }
+
+      // End Turn button - amber/orange, slightly larger
+      &-end-turn {
+        padding: 10px 14px;
+        background-color: rgba(245, 158, 11, 0.2);
+        border-color: rgba(245, 158, 11, 0.5);
+        color: #fbbf24;
+        font-weight: 600;
+
+        &:hover:not(:disabled) {
+          background-color: rgba(245, 158, 11, 0.35);
+          border-color: #F59E0B;
+        }
+      }
+
+      // Close button - ghost/outline style
+      &-close {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+
+        &:hover:not(:disabled) {
+          background-color: rgba(255, 255, 255, 0.06);
+          border-color: rgba(255, 255, 255, 0.35);
+          color: rgba(255, 255, 255, 0.7);
+        }
+      }
+
+      // Disabled state
       &:disabled {
-        background-color: #D8D8D8;
-        border: 2px solid #E5E5E5;
+        opacity: 0.4;
+        cursor: not-allowed;
+        background-color: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.06);
       }
+    }
+
+    // Separator line
+    &-separator {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      margin: 6px 0;
+      width: 100%;
     }
   }
 
+  // Weapon sub-menu
   &-sub-menu {
-    margin-left: 64px;
-
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+    gap: 4px;
+    padding: 4px 0;
+
+    &-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease;
+
+      &:hover:not(.action-sub-menu-item--disabled) {
+        background: rgba(220, 53, 69, 0.15);
+        border-color: rgba(220, 53, 69, 0.3);
+      }
+
+      &--active {
+        background: rgba(220, 53, 69, 0.25) !important;
+        border-color: #DC3545 !important;
+      }
+
+      &--disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
 
     &-description {
-      font-size: 4px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      gap: 8px;
+
+      &-stat {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.5);
+
+        span {
+          color: rgba(255, 255, 255, 0.75);
+          font-weight: 500;
+        }
+      }
     }
   }
 }
@@ -150,6 +402,17 @@
   &-270 {
     transform: rotate(270deg);
   }
+}
+
+// Pulsing border animations for range highlights
+@keyframes pulse-blue {
+  0%, 100% { border-color: rgba(100, 150, 255, 0.4); }
+  50% { border-color: rgba(100, 150, 255, 0.8); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { border-color: rgba(255, 100, 100, 0.4); }
+  50% { border-color: rgba(255, 100, 100, 0.8); }
 }
 
 // Animation effects
@@ -172,8 +435,49 @@
   animation: damage-float 600ms ease-out forwards;
 }
 
+// Turn change animation
+@keyframes turn-change-fade {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.turn-change-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: turn-change-fade 1200ms ease-in-out forwards;
+  z-index: 100;
+}
+
+.turn-change-banner {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.turn-change-label {
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+.turn-change-name {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animation-layer * {
+  .animation-layer *,
+  .cell-move-range,
+  .cell-attack-range {
     animation-duration: 0ms !important;
     transition-duration: 0ms !important;
   }
