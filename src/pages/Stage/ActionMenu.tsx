@@ -29,26 +29,43 @@ export const ActionMenu = () => {
     const { status: unitStatus } = loadUnit(targetUnitId, units);
     const coord = unitStatus.coordinate;
     const gridCols = tutorialScenario.gridSize.cols;
-    const showOnLeft = coord.x >= Math.ceil(gridCols / 2); // >= 7 out of 13
+    const gridRows = tutorialScenario.gridSize.rows;
 
     // Account for stage padding (12px from .stage padding in SCSS)
     const stagePadding = 12;
 
+    const showOnLeft = coord.x >= Math.ceil(gridCols / 2); // >= 7 out of 13
+    const showAbove = coord.y >= Math.ceil(gridRows / 2); // >= 5 out of 10
+
+    const transformParts: string[] = [];
+
+    // Vertical positioning
+    let top: number;
+    if (showAbove) {
+      // Align bottom of menu with bottom of cell
+      top = GRID_OFFSET + stagePadding + (coord.y + 1) * CELL_INTERVAL;
+      transformParts.push("translateY(-100%)");
+    } else {
+      // Align top of menu with top of cell (default)
+      top = GRID_OFFSET + stagePadding + coord.y * CELL_INTERVAL;
+    }
+
+    // Horizontal positioning
+    let left: number;
     if (showOnLeft) {
       // Show to the LEFT of the unit cell
-      return {
-        top: GRID_OFFSET + stagePadding + coord.y * CELL_INTERVAL,
-        left: GRID_OFFSET + stagePadding + coord.x * CELL_INTERVAL - 8, // 8px gap
-        transform: "translateX(-100%)",
-      };
+      left = GRID_OFFSET + stagePadding + coord.x * CELL_INTERVAL - 8; // 8px gap
+      transformParts.push("translateX(-100%)");
     } else {
       // Show to the RIGHT of the unit cell
-      return {
-        top: GRID_OFFSET + stagePadding + coord.y * CELL_INTERVAL,
-        left: GRID_OFFSET + stagePadding + coord.x * CELL_INTERVAL + CELL_INTERVAL + 8, // 8px gap
-        transform: "none",
-      };
+      left = GRID_OFFSET + stagePadding + coord.x * CELL_INTERVAL + CELL_INTERVAL + 8; // 8px gap
     }
+
+    return {
+      top,
+      left,
+      transform: transformParts.length > 0 ? transformParts.join(" ") : "none",
+    };
   }, [targetUnitId, units]);
 
   if (!targetUnitId) return <></>;
