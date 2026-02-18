@@ -1,4 +1,4 @@
-import { Coordinate, Player, UnitType } from "../types";
+import { Coordinate, Player, TerrainType, UnitType } from "../types";
 import { Scenario } from "../types/scenario";
 import { getAraments } from "../constants";
 
@@ -247,10 +247,43 @@ const INITIAL_UNITS: UnitType[] = [
   },
 ];
 
+const P: TerrainType = "plain";
+const F: TerrainType = "forest";
+const M: TerrainType = "mountain";
+const W: TerrainType = "water";
+
+// 10 rows x 13 cols terrain map
+// Rows 0-4: Villain spawn area (mostly plain)
+// Rows 5-6: Middle zone with forest strip, mountains on flanks, water obstacle
+// Rows 7-9: Hero spawn area (mostly plain)
+const TERRAIN: TerrainType[][] = [
+  // Row 0: all plain (Villain back row)
+  [P, P, P, P, P, P, P, P, P, P, P, P, P],
+  // Row 1: all plain (Villain spawn)
+  [P, P, P, P, P, P, P, P, P, P, P, P, P],
+  // Row 2: all plain (Villain spawn)
+  [P, P, P, P, P, P, P, P, P, P, P, P, P],
+  // Row 3: all plain (Villain tanks)
+  [P, P, P, P, P, P, P, P, P, P, P, P, P],
+  // Row 4: plain with forest edges (Villain soldiers row)
+  [F, P, P, P, P, P, P, P, P, P, P, P, F],
+  // Row 5: forest strip with gaps — the battlefield divider
+  [P, F, F, P, F, F, P, F, F, P, F, F, P],
+  // Row 6: mountains on flanks, water pond in center
+  [M, P, P, P, P, W, W, W, P, P, P, P, M],
+  // Row 7: plain with forest edges (Hero approach)
+  [F, P, P, P, P, P, P, P, P, P, P, P, F],
+  // Row 8: all plain (Hero fighters)
+  [P, P, P, P, P, P, P, P, P, P, P, P, P],
+  // Row 9: all plain (Hero tank + soldiers)
+  [P, P, P, P, P, P, P, P, P, P, P, P, P],
+];
+
 export const tutorialScenario: Scenario = {
   id: "tutorial",
   name: "Tutorial Battle",
   gridSize: { rows: ROW_NUM, cols: CELL_NUM_IN_ROW },
   players: PLAYERS,
   units: INITIAL_UNITS,
+  terrain: TERRAIN,
 };

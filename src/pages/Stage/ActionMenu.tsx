@@ -134,6 +134,21 @@ export const ActionMenu = () => {
         移動
       </button>
 
+      {/* Undo Move button */}
+      <button
+        className="action-menu-btn"
+        onClick={() => {
+          setIsAttacking(false);
+          dispatch({
+            type: "UNDO_MOVE",
+            payload: { running_unit_id: spec.id },
+          });
+        }}
+        disabled={!status.moved || status.attacked}
+      >
+        戻す
+      </button>
+
       {/* Attack button */}
       <button
         className={

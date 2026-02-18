@@ -1,8 +1,19 @@
 import React, { useContext } from "react";
 import { ActionContext } from ".";
 import { CellWithUnit } from "./CellWithUnit";
+import { tutorialScenario } from "../../scenarios/tutorial";
 
-export const IdleCell = React.memo(({ unitId }: { x: number, y: number, unitId?: number }) => {
+const getTerrainClass = (x: number, y: number): string => {
+  const terrain = tutorialScenario.terrain[y][x];
+  switch (terrain) {
+    case "forest": return " cell-terrain-forest";
+    case "mountain": return " cell-terrain-mountain";
+    case "water": return " cell-terrain-water";
+    default: return "";
+  }
+};
+
+export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, unitId?: number }) => {
   const { dispatch } = useContext(ActionContext);
   if (unitId) {
     return <CellWithUnit
@@ -16,7 +27,7 @@ export const IdleCell = React.memo(({ unitId }: { x: number, y: number, unitId?:
 
   return (
     <div
-      className="cell"
+      className={`cell${getTerrainClass(x, y)}`}
     />
   );
 });

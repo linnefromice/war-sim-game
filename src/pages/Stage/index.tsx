@@ -1,13 +1,17 @@
-import { createContext, useContext, useMemo, useReducer, useRef } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import "./Stage.scss"
 import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
 import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState, GameAction } from "../../game/types";
-import { gameReducer, getPlayer, loadUnit, nextPlayer } from "../../game/gameReducer";
+import { gameReducer, getPlayer, getTerrainDefenseReduction, loadUnit, nextPlayer } from "../../game/gameReducer";
 import { ActionMenu } from "./ActionMenu";
 import { AnimationLayer } from "./AnimationLayer";
+import { ReplayViewer } from "./ReplayViewer";
+import { AIAction, computeAIActions } from "../../game/ai";
+
+const AI_PLAYER_ID = 2;
 
 const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
   return 'x' in action && 'y' in action && !('target_unit_id' in action);
@@ -21,6 +25,7 @@ const initialGameState: GameState = {
   activePlayerId: 1,
   units: tutorialScenario.units,
   phase: { type: "playing" },
+  history: [],
 };
 
 export const ActionContext = createContext<{
@@ -95,7 +100,9 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
         const unit = loadUnit(payload.running_unit_id, gameState.units);
         const target = loadUnit(payload.action.target_unit_id, gameState.units);
         const armament = unit.spec.armaments[payload.action.armament_idx];
-        const damage = armament.value;
+        const targetTerrain = tutorialScenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
+        const defenseReduction = getTerrainDefenseReduction(targetTerrain);
+        const damage = Math.floor(armament.value * (1 - defenseReduction));
         const destroyed = target.status.hp - damage <= 0;
         uiDispatch({ type: "ANIMATION_START_ATTACK", targetId: payload.action.target_unit_id, damage, destroyed });
         pendingGameAction.current = {
@@ -103,6 +110,12 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
           unitId: payload.running_unit_id,
           payload: payload.action,
         };
+        break;
+      }
+      case "UNDO_MOVE": {
+        if (payload?.running_unit_id === undefined) return;
+        gameDispatch({ type: "UNDO_MOVE", unitId: payload.running_unit_id });
+        uiDispatch({ type: "RESET" });
         break;
       }
       case "ANIMATION_COMPLETE": {
@@ -134,7 +147,105 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
 };
 
 const StageContent = () => {
-  const { gameState, uiState } = useContext(ActionContext);
+  const { dispatch, gameState, uiState } = useContext(ActionContext);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle keys during animations
+      if (uiState.animationState.type !== "idle") return;
+      // Block keyboard input during AI turn
+      if (gameState.activePlayerId === AI_PLAYER_ID) return;
+
+      switch (e.key) {
+        case "Escape": {
+          if (uiState.isOpen) {
+            e.preventDefault();
+            dispatch({ type: "CLOSE_MENU" });
+          }
+          break;
+        }
+        case "Enter": {
+          if (uiState.isOpen) {
+            e.preventDefault();
+            dispatch({ type: "TURN_END" });
+          }
+          break;
+        }
+        case "Tab": {
+          e.preventDefault();
+          // Find current player's units
+          const playerUnits = gameState.units
+            .filter(u => u.playerId === gameState.activePlayerId)
+            .sort((a, b) => a.spec.id - b.spec.id);
+
+          if (playerUnits.length === 0) return;
+
+          // Find current selected unit index, cycle to next
+          const currentIdx = uiState.targetUnitId
+            ? playerUnits.findIndex(u => u.spec.id === uiState.targetUnitId)
+            : -1;
+          const nextIdx = (currentIdx + 1) % playerUnits.length;
+          const nextUnit = playerUnits[nextIdx];
+
+          dispatch({ type: "OPEN_MENU", payload: { running_unit_id: nextUnit.spec.id } });
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [dispatch, gameState.units, gameState.activePlayerId, uiState.isOpen, uiState.targetUnitId, uiState.animationState.type]);
+
+  // --- AI Opponent ---
+  const aiActionsRef = useRef<AIAction[]>([]);
+
+  useEffect(() => {
+    // Only act when it's AI's turn, animation is idle, game is playing
+    if (gameState.activePlayerId !== AI_PLAYER_ID) {
+      aiActionsRef.current = [];
+      return;
+    }
+    if (uiState.animationState.type !== "idle") return;
+    if (gameState.phase.type !== "playing") return;
+
+    // Compute AI actions if queue is empty
+    if (aiActionsRef.current.length === 0) {
+      aiActionsRef.current = computeAIActions(gameState.units, AI_PLAYER_ID);
+    }
+
+    // Dispatch next action from queue
+    if (aiActionsRef.current.length > 0) {
+      const nextAction = aiActionsRef.current.shift()!;
+      const timer = setTimeout(() => {
+        switch (nextAction.type) {
+          case "move":
+            dispatch({
+              type: "DO_MOVE",
+              payload: {
+                running_unit_id: nextAction.unitId,
+                action: nextAction.payload,
+              },
+            });
+            break;
+          case "attack":
+            dispatch({
+              type: "DO_ATTACK",
+              payload: {
+                running_unit_id: nextAction.unitId,
+                action: nextAction.payload,
+              },
+            });
+            break;
+          case "turn_end":
+            dispatch({ type: "TURN_END" });
+            aiActionsRef.current = [];
+            break;
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.activePlayerId, gameState.units, gameState.phase.type, uiState.animationState.type, dispatch]);
 
   const unitsCoordinates = useMemo(() => {
     // Hide moving unit from grid during move animation (AnimationLayer renders it)
@@ -179,6 +290,17 @@ const StageContent = () => {
             <span style={{ color: "gray", marginLeft: "8px", fontSize: "0.9rem" }}>
               のターン
             </span>
+            {gameState.activePlayerId === AI_PLAYER_ID && (
+              <span style={{
+                marginLeft: "8px",
+                padding: "2px 8px",
+                backgroundColor: "rgba(255,0,0,0.3)",
+                borderRadius: "4px",
+                fontSize: "0.75rem",
+              }}>
+                AI
+              </span>
+            )}
           </div>
           <div style={{ display: "flex", gap: "16px", fontSize: "0.85rem" }}>
             <span style={{
@@ -218,7 +340,8 @@ const StageContent = () => {
 
 const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
   const winner = getPlayer(winnerId, tutorialScenario.players);
-  const { onRestart } = useContext(ActionContext);
+  const { gameState, onRestart } = useContext(ActionContext);
+  const [showReplay, setShowReplay] = useState(false);
   return (
     <div
       style={{
@@ -244,30 +367,60 @@ const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
       >
         <p>{`Player ${winner.id} Wins!`}</p>
         <p style={{ fontSize: "1.5rem" }}>{winner.name}</p>
-        <button
-          onClick={onRestart}
-          style={{
-            marginTop: "2rem",
-            padding: "1rem 2rem",
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-            color: "white",
-            backgroundColor: "transparent",
-            border: "2px solid white",
-            borderRadius: "0.5rem",
-            cursor: "pointer",
-            transition: "background-color 0.3s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-          }}
-        >
-          Restart
-        </button>
+        <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginTop: "2rem" }}>
+          <button
+            onClick={onRestart}
+            style={{
+              padding: "1rem 2rem",
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: "white",
+              backgroundColor: "transparent",
+              border: "2px solid white",
+              borderRadius: "0.5rem",
+              cursor: "pointer",
+              transition: "background-color 0.3s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+          >
+            Restart
+          </button>
+          <button
+            onClick={() => setShowReplay(true)}
+            style={{
+              padding: "1rem 2rem",
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: "white",
+              backgroundColor: "transparent",
+              border: "2px solid white",
+              borderRadius: "0.5rem",
+              cursor: "pointer",
+              transition: "background-color 0.3s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+          >
+            リプレイ
+          </button>
+        </div>
       </div>
+      {showReplay && (
+        <ReplayViewer
+          history={gameState.history}
+          initialUnits={tutorialScenario.units}
+          onClose={() => setShowReplay(false)}
+        />
+      )}
     </div>
   );
 };

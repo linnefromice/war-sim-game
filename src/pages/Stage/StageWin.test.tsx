@@ -32,6 +32,11 @@ vi.mock("../../scenarios/tutorial", () => {
         { id: 1, name: "Hero", rgb: [0, 0, 255] },
         { id: 2, name: "Villan", rgb: [255, 0, 0] },
       ],
+      terrain: [
+        ["plain", "plain", "plain"],
+        ["plain", "plain", "plain"],
+        ["plain", "plain", "plain"],
+      ],
       units: [
         {
           spec: {
