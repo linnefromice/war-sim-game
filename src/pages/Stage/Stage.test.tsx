@@ -1,7 +1,7 @@
 import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { MOVE_DURATION, ATTACK_DURATION } from "./AnimationLayer";
+import { MOVE_DURATION, ATTACK_DURATION, TURN_CHANGE_DURATION } from "./AnimationLayer";
 
 // Mock UnitIcon to avoid SVG import issues in test environment
 vi.mock("./UnitIcon", () => ({
@@ -244,6 +244,11 @@ describe("Stage component tests (full scenario)", () => {
 
     // Click 確定 to end turn
     await user.click(screen.getByText("確定"));
+
+    // Complete turn change animation
+    await act(() => {
+      vi.advanceTimersByTime(TURN_CHANGE_DURATION);
+    });
 
     // Player should switch to Player 2
     expect(screen.getByText(/▶ Villan/)).toBeInTheDocument();

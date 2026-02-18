@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { ActionContext } from ".";
-import { loadUnit } from "../../game/gameReducer";
+import { getPlayer, loadUnit } from "../../game/gameReducer";
+import { tutorialScenario } from "../../scenarios/tutorial";
 import { UnitIcon } from "./UnitIcon";
 import { Coordinate, UnitCategory } from "../../types";
 
@@ -14,6 +15,7 @@ const GRID_OFFSET = STAGE_MARGIN + CELL_MARGIN; // 5px
 
 export const MOVE_DURATION = 300;
 export const ATTACK_DURATION = 600;
+export const TURN_CHANGE_DURATION = 1200;
 
 const cellPosition = (coord: Coordinate) => ({
   left: GRID_OFFSET + coord.x * CELL_INTERVAL,
@@ -94,6 +96,20 @@ const AttackAnimation = ({ coord, damage }: { coord: Coordinate; damage: number 
   );
 };
 
+const TurnChangeAnimation = ({ nextPlayerId }: { nextPlayerId: number }) => {
+  const player = getPlayer(nextPlayerId, tutorialScenario.players);
+  return (
+    <div className="turn-change-overlay">
+      <div className="turn-change-banner" style={{
+        color: `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})`,
+      }}>
+        <div className="turn-change-label">TURN</div>
+        <div className="turn-change-name">{player.name}</div>
+      </div>
+    </div>
+  );
+};
+
 export const AnimationLayer = () => {
   const { uiState, dispatch, gameState } = useContext(ActionContext);
   const { animationState } = uiState;
@@ -101,7 +117,9 @@ export const AnimationLayer = () => {
   useEffect(() => {
     if (animationState.type === "idle") return;
 
-    const duration = animationState.type === "move" ? MOVE_DURATION : ATTACK_DURATION;
+    const duration = animationState.type === "move" ? MOVE_DURATION
+      : animationState.type === "attack" ? ATTACK_DURATION
+      : TURN_CHANGE_DURATION;
     const reducedMotion = typeof window.matchMedia === "function"
       && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const actualDuration = reducedMotion ? 0 : duration;
@@ -129,6 +147,14 @@ export const AnimationLayer = () => {
     return (
       <div className="animation-layer" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
         <AttackAnimation coord={target.status.coordinate} damage={animationState.damage} />
+      </div>
+    );
+  }
+
+  if (animationState.type === "turn_change") {
+    return (
+      <div className="animation-layer" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+        <TurnChangeAnimation nextPlayerId={animationState.nextPlayerId} />
       </div>
     );
   }
