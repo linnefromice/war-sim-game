@@ -6,7 +6,9 @@ import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState, GameAction } from "../../game/types";
 import { gameReducer, getPlayer, getTerrainDefenseReduction, loadUnit, nextPlayer } from "../../game/gameReducer";
-import { ActionMenu } from "./ActionMenu";
+import { ActionButtons } from "./ActionButtons";
+import { UnitDetailPanel } from "./UnitDetailPanel";
+import { TurnBanner } from "./TurnBanner";
 import { AnimationLayer } from "./AnimationLayer";
 import { ReplayViewer } from "./ReplayViewer";
 import { AIAction, computeAIActions } from "../../game/ai";
@@ -264,60 +266,10 @@ const StageContent = () => {
     }, new Map<string, number>());
   }, [gameState.units, uiState.animationState]);
 
-  const activePlayer = getPlayer(gameState.activePlayerId, tutorialScenario.players);
-
-  const player1Units = gameState.units.filter(u => u.playerId === 1);
-  const player2Units = gameState.units.filter(u => u.playerId === 2);
-
   return (
     <>
-      <div className="player-info" style={{
-        backgroundColor: `rgba(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]}, 0.15)`,
-        border: `2px solid rgba(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]}, 0.5)`,
-        borderRadius: "8px",
-        padding: "8px 16px",
-        marginBottom: "8px",
-      }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
-          <div>
-            <span style={{
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              color: `rgb(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]})`,
-            }}>
-              ▶ {activePlayer.name}
-            </span>
-            <span style={{ color: "gray", marginLeft: "8px", fontSize: "0.9rem" }}>
-              のターン
-            </span>
-            {gameState.activePlayerId === AI_PLAYER_ID && (
-              <span style={{
-                marginLeft: "8px",
-                padding: "2px 8px",
-                backgroundColor: "rgba(255,0,0,0.3)",
-                borderRadius: "4px",
-                fontSize: "0.75rem",
-              }}>
-                AI
-              </span>
-            )}
-          </div>
-          <div style={{ display: "flex", gap: "16px", fontSize: "0.85rem" }}>
-            <span style={{
-              color: `rgb(${tutorialScenario.players[0].rgb[0]}, ${tutorialScenario.players[0].rgb[1]}, ${tutorialScenario.players[0].rgb[2]})`,
-            }}>
-              {tutorialScenario.players[0].name}: {player1Units.length}体
-            </span>
-            <span style={{ color: "gray" }}>vs</span>
-            <span style={{
-              color: `rgb(${tutorialScenario.players[1].rgb[0]}, ${tutorialScenario.players[1].rgb[1]}, ${tutorialScenario.players[1].rgb[2]})`,
-            }}>
-              {tutorialScenario.players[1].name}: {player2Units.length}体
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="play-area" style={{ position: "relative" }}>
+      <TurnBanner />
+      <div className="play-area">
         <div className="stage">
           {Array.from({ length: tutorialScenario.gridSize.rows }).map((_, y) => (
             <div key={`row.${y}`} className="row">
@@ -329,7 +281,8 @@ const StageContent = () => {
           ))}
         </div>
         <AnimationLayer />
-        {uiState.isOpen && <ActionMenu />}
+        {uiState.isOpen && <ActionButtons />}
+        <UnitDetailPanel />
       </div>
       {gameState.phase.type === "finished" && (
         <GameOverOverlay winnerId={gameState.phase.winner} />
