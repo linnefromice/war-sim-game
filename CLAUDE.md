@@ -96,3 +96,43 @@ Action menu labels are in Japanese: 移動 (Move), 攻撃 (Attack), 確定 (End 
 ## Improvement Plan
 
 `IMPROVEMENT_PLAN.md` contains the full roadmap with prioritized phases. Key remaining items: component performance optimization, additional scenarios, AI opponents.
+
+
+
+## Agent Team Operational Rules
+
+このプロジェクトでは Claude Code の Agent Teams を活用します。
+以下のルールは全 Teammate に適用されます。
+
+### Agent Teams の自動起動
+
+複雑なタスクでは、`/team-start` コマンドなしでも Agent Teams が自動的に組成されます。
+起動基準の詳細は `.claude/rules/agent-teams.md` を参照してください。
+
+- タスクの複雑さに応じて、Claude が自律的にチーム起動を判断します
+- 起動前にユーザーへ理由を説明し、承認を得てからチームを組成します
+- ユーザーが拒否した場合は、即座に単独作業に切り替えます
+
+### チーム構成の原則
+
+- 並列作業が有効なタスクでは、Agent Teams を積極的に活用する
+- リード（team lead）は調整に専念し、実装はすべて Teammate が行う
+- Delegate Mode（`Shift+Tab`）を使用してリードの実装を構造的に制限する
+
+### Teammate の行動規範
+
+- **能動的な取得**: 共有タスクリストから能動的に未着手タスクを claim すること
+- **即時通信**: 共通インターフェースに影響が出る変更は、即座に関連 Teammate にメッセージを送ること
+- **品質ゲート**: テストを実行せずにタスクを Complete とマークしないこと
+- **コンテキスト共有**: 発見した重要な情報は他の Teammate と共有すること
+
+### タスク設計ガイドライン
+
+- 1人あたり 5〜6 タスクの粒度で分割する
+- タスク間の依存関係を明示的に定義する
+- リスクの高い変更には Plan approval を要求する
+
+### ファイル競合の防止
+
+- 2人の Teammate が同一ファイルを編集しないよう、担当範囲を分割する
+- 共有ファイルへの変更が必要な場合は、事前に担当者間で調整する
