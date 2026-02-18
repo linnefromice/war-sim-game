@@ -1,4 +1,4 @@
-import { Player, UnitType } from "./index";
+import { Player, UnitType, TerrainType } from "./index";
 
 export type Scenario = {
   id: string;
@@ -6,4 +6,5 @@ export type Scenario = {
   gridSize: { rows: number; cols: number };
   players: Player[];
   units: UnitType[];
+  terrain: TerrainType[][];
 };

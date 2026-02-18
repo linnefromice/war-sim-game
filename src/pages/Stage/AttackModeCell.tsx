@@ -3,6 +3,17 @@ import { ActionContext } from ".";
 import { loadUnit } from "../../game/gameReducer";
 import { CellWithUnit } from "./CellWithUnit";
 import { isWithinRange } from "./cellUtils";
+import { tutorialScenario } from "../../scenarios/tutorial";
+
+const getTerrainClass = (x: number, y: number): string => {
+  const terrain = tutorialScenario.terrain[y][x];
+  switch (terrain) {
+    case "forest": return " cell-terrain-forest";
+    case "mountain": return " cell-terrain-mountain";
+    case "water": return " cell-terrain-water";
+    default: return "";
+  }
+};
 
 export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selectedArmamentIdx }: { x: number, y: number, unitId?: number, targetUnitId: number, selectedArmamentIdx: number }) => {
   const { gameState: { units }, dispatch } = useContext(ActionContext);
@@ -12,10 +23,12 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
 
   if (isWithinRange(status.coordinate, { x, y }, attack_range)) {
     if (unitId) {
-      // Calculate damage preview
+      // Calculate damage preview with terrain defense
       const target = loadUnit(unitId, units);
       const weapon = spec.armaments[selectedArmamentIdx];
-      const predictedDamage = weapon.value;
+      const targetTerrain = tutorialScenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
+      const defenseReduction = targetTerrain === "forest" ? 0.2 : targetTerrain === "mountain" ? 0.4 : 0;
+      const predictedDamage = Math.floor(weapon.value * (1 - defenseReduction));
       const remainingHp = Math.max(0, target.status.hp - predictedDamage);
       const isLethal = remainingHp === 0;
 
@@ -51,8 +64,8 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
             }}
           >
             <div>{`-${predictedDamage}`}</div>
-            <div style={{ fontSize: "0.55rem" }}>{`→${remainingHp}`}</div>
-            {isLethal && <div style={{ fontSize: "0.6rem" }}>💀</div>}
+            <div style={{ fontSize: "0.55rem" }}>{`\u2192${remainingHp}`}</div>
+            {isLethal && <div style={{ fontSize: "0.6rem" }}>&#x1F480;</div>}
           </div>
         </div>
       );
@@ -73,7 +86,7 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
 
   return (
     <div
-      className="cell"
+      className={`cell${getTerrainClass(x, y)}`}
     />
   );
 });

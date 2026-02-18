@@ -55,6 +55,7 @@ const makeGameState = (overrides?: Partial<GameState>): GameState => ({
     makeUnit(2, 2, { ...coord(5, 2) }),
   ],
   phase: { type: "playing" },
+  history: [],
   ...overrides,
 });
 
@@ -274,6 +275,71 @@ describe("gameReducer", () => {
     });
   });
 
+  describe("UNDO_MOVE", () => {
+    it("undoes a move and restores unit to initial position", () => {
+      // Unit starts at (3,8), moves to (4,7), then undoes
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, {
+            ...coord(3, 8),
+            coordinate: { x: 4, y: 7 },
+            previousCoordinate: { x: 3, y: 8 },
+            initialCoordinate: { x: 3, y: 8 },
+            moved: true,
+          }),
+          makeUnit(2, 2, { ...coord(5, 2) }),
+        ],
+      });
+      const result = gameReducer(state, { type: "UNDO_MOVE", unitId: 1 });
+      const unit = result.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unit.status.coordinate).toEqual({ x: 3, y: 8 });
+      expect(unit.status.previousCoordinate).toEqual({ x: 3, y: 8 });
+      expect(unit.status.moved).toBe(false);
+    });
+
+    it("does not undo if unit has not moved", () => {
+      const state = makeGameState();
+      const result = gameReducer(state, { type: "UNDO_MOVE", unitId: 1 });
+      expect(result).toBe(state); // unchanged reference
+    });
+
+    it("does not undo if unit has already attacked", () => {
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, {
+            ...coord(3, 8),
+            coordinate: { x: 4, y: 7 },
+            previousCoordinate: { x: 3, y: 8 },
+            initialCoordinate: { x: 3, y: 8 },
+            moved: true,
+            attacked: true,
+          }),
+          makeUnit(2, 2, { ...coord(5, 2) }),
+        ],
+      });
+      const result = gameReducer(state, { type: "UNDO_MOVE", unitId: 1 });
+      expect(result).toBe(state); // unchanged reference
+    });
+
+    it("does not undo if unit belongs to another player", () => {
+      const state = makeGameState({
+        activePlayerId: 1,
+        units: [
+          makeUnit(1, 1, { ...coord(3, 8) }),
+          makeUnit(2, 2, {
+            ...coord(5, 2),
+            coordinate: { x: 6, y: 3 },
+            previousCoordinate: { x: 5, y: 2 },
+            initialCoordinate: { x: 5, y: 2 },
+            moved: true,
+          }),
+        ],
+      });
+      const result = gameReducer(state, { type: "UNDO_MOVE", unitId: 2 });
+      expect(result).toBe(state); // unchanged reference
+    });
+  });
+
   describe("TURN_END", () => {
     it("recovers EN for active player (capped at max), resets moved/attacked, switches player", () => {
       const state = makeGameState({
@@ -398,6 +464,179 @@ describe("gameReducer", () => {
       // TURN_END detects no opponent units
       const afterTurnEnd = gameReducer(afterAttack, { type: "TURN_END" });
       expect(afterTurnEnd.phase).toEqual({ type: "finished", winner: 1 });
+    });
+  });
+
+  // ── Terrain Tests ──
+
+  describe("Terrain", () => {
+    it("cannot move to water terrain", () => {
+      // Water is at (5,6), (6,6), (7,6) in the tutorial terrain map
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, { ...coord(5, 5) }), // forest cell, adjacent to water at (5,6)
+          makeUnit(2, 2, { ...coord(10, 2) }),
+        ],
+      });
+      const result = gameReducer(state, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 5, y: 6 }, // water cell
+      });
+      const unit = result.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unit.status.coordinate).toEqual({ x: 5, y: 5 }); // unchanged
+    });
+
+    it("forest terrain reduces attack damage by 20%", () => {
+      // Forest is at (1,5) in the tutorial terrain map
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, { ...coord(1, 4) }), // plain cell, adjacent to forest
+          makeUnit(2, 2, { ...coord(1, 5) }), // forest cell — target
+        ],
+      });
+      const result = gameReducer(state, {
+        type: "DO_ATTACK",
+        unitId: 1,
+        payload: { target_unit_id: 2, armament_idx: 0 }, // Gun: 200 base dmg
+      });
+      const target = result.units.find((u: UnitType) => u.spec.id === 2)!;
+      // 200 * (1 - 0.2) = 160 actual damage, so HP = 1000 - 160 = 840
+      expect(target.status.hp).toBe(840);
+    });
+
+    it("mountain terrain reduces attack damage by 40%", () => {
+      // Mountain is at (0,6) in the tutorial terrain map
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, { ...coord(1, 6) }), // plain cell, adjacent to mountain
+          makeUnit(2, 2, { ...coord(0, 6) }), // mountain cell — target
+        ],
+      });
+      const result = gameReducer(state, {
+        type: "DO_ATTACK",
+        unitId: 1,
+        payload: { target_unit_id: 2, armament_idx: 0 }, // Gun: 200 base dmg
+      });
+      const target = result.units.find((u: UnitType) => u.spec.id === 2)!;
+      // 200 * (1 - 0.4) = 120 actual damage, so HP = 1000 - 120 = 880
+      expect(target.status.hp).toBe(880);
+    });
+
+    it("plain terrain provides no defense bonus", () => {
+      // Both units on plain cells (default test positions)
+      const state = makeGameState();
+      const result = gameReducer(state, {
+        type: "DO_ATTACK",
+        unitId: 1,
+        payload: { target_unit_id: 2, armament_idx: 0 }, // Gun: 200 base dmg
+      });
+      const target = result.units.find((u: UnitType) => u.spec.id === 2)!;
+      // 200 * (1 - 0) = 200 actual damage, so HP = 1000 - 200 = 800
+      expect(target.status.hp).toBe(800);
+    });
+
+    it("allows movement to plain terrain", () => {
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, { ...coord(3, 8) }), // plain
+          makeUnit(2, 2, { ...coord(5, 2) }),
+        ],
+      });
+      const result = gameReducer(state, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 4, y: 8 }, // also plain
+      });
+      const unit = result.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unit.status.coordinate).toEqual({ x: 4, y: 8 });
+    });
+
+    it("allows movement to forest terrain", () => {
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, { ...coord(3, 5) }), // plain at (3,5)
+          makeUnit(2, 2, { ...coord(10, 2) }),
+        ],
+      });
+      const result = gameReducer(state, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 4, y: 5 }, // forest at (4,5)
+      });
+      const unit = result.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unit.status.coordinate).toEqual({ x: 4, y: 5 });
+    });
+
+    it("allows movement to mountain terrain", () => {
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, { ...coord(1, 6) }), // plain at (1,6)
+          makeUnit(2, 2, { ...coord(10, 2) }),
+        ],
+      });
+      const result = gameReducer(state, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 0, y: 6 }, // mountain at (0,6)
+      });
+      const unit = result.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unit.status.coordinate).toEqual({ x: 0, y: 6 });
+    });
+  });
+
+  // ── History Tests ──
+
+  describe("History", () => {
+    it("records actions in history", () => {
+      const state = makeGameState();
+      expect(state.history).toHaveLength(0);
+
+      // DO_MOVE
+      const moveAction = { type: "DO_MOVE" as const, unitId: 1, payload: { x: 4, y: 7 } };
+      const afterMove = gameReducer(state, moveAction);
+      expect(afterMove.history).toHaveLength(1);
+      expect(afterMove.history[0]).toEqual(moveAction);
+
+      // DO_ATTACK
+      const attackAction = { type: "DO_ATTACK" as const, unitId: 1, payload: { target_unit_id: 2, armament_idx: 0 } };
+      const afterAttack = gameReducer(afterMove, attackAction);
+      expect(afterAttack.history).toHaveLength(2);
+      expect(afterAttack.history[1]).toEqual(attackAction);
+
+      // TURN_END
+      const turnEndAction = { type: "TURN_END" as const };
+      const afterTurnEnd = gameReducer(afterAttack, turnEndAction);
+      expect(afterTurnEnd.history).toHaveLength(3);
+      expect(afterTurnEnd.history[2]).toEqual(turnEndAction);
+    });
+
+    it("records UNDO_MOVE in history", () => {
+      const state = makeGameState({
+        units: [
+          makeUnit(1, 1, {
+            ...coord(3, 8),
+            coordinate: { x: 4, y: 7 },
+            previousCoordinate: { x: 3, y: 8 },
+            initialCoordinate: { x: 3, y: 8 },
+            moved: true,
+          }),
+          makeUnit(2, 2, { ...coord(5, 2) }),
+        ],
+      });
+      const undoAction = { type: "UNDO_MOVE" as const, unitId: 1 };
+      const result = gameReducer(state, undoAction);
+      expect(result.history).toHaveLength(1);
+      expect(result.history[0]).toEqual(undoAction);
+    });
+
+    it("does not record action when game is finished", () => {
+      const state = makeGameState({
+        phase: { type: "finished", winner: 1 },
+        history: [{ type: "TURN_END" }],
+      });
+      const result = gameReducer(state, { type: "DO_MOVE", unitId: 1, payload: { x: 4, y: 7 } });
+      expect(result.history).toHaveLength(1); // unchanged
     });
   });
 });

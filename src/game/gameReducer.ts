@@ -1,6 +1,17 @@
-import { UnitType, OrientationType, Player, PayloadMoveActionType, PayloadAttackActionType } from "../types";
+import { UnitType, OrientationType, Player, PayloadMoveActionType, PayloadAttackActionType, TerrainType } from "../types";
 import { tutorialScenario } from "../scenarios/tutorial";
 import { GameState, GameAction } from "./types";
+
+// --- Terrain helpers ---
+
+export const getTerrainDefenseReduction = (terrain: TerrainType): number => {
+  switch (terrain) {
+    case "plain": return 0;
+    case "forest": return 0.2;
+    case "mountain": return 0.4;
+    case "water": return 0;
+  }
+};
 
 // --- Type Guards ---
 
@@ -79,6 +90,10 @@ const updateUnitsByMove = (
   const { x, y } = payloadAction;
   if (x < 0 || x >= tutorialScenario.gridSize.cols || y < 0 || y >= tutorialScenario.gridSize.rows) return oldUnits;
 
+  // Block movement to water terrain
+  const terrain = tutorialScenario.terrain[y][x];
+  if (terrain === "water") return oldUnits;
+
   const updatedUnit = {
     ...unitInAction,
     status: {
@@ -100,7 +115,10 @@ const updateUnitsByAttack = (
   if (armament.consumed_en > unitInAction.status.en) return oldUnits;
 
   const attacked = loadUnit(payloadAction.target_unit_id, oldUnits);
-  const remainHp = attacked.status.hp - armament.value;
+  const targetTerrain = tutorialScenario.terrain[attacked.status.coordinate.y][attacked.status.coordinate.x];
+  const defenseReduction = getTerrainDefenseReduction(targetTerrain);
+  const actualDamage = Math.floor(armament.value * (1 - defenseReduction));
+  const remainHp = attacked.status.hp - actualDamage;
 
   const newUnits =
     remainHp > 0
@@ -136,14 +154,31 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       const unitInAction = loadUnit(action.unitId, state.units);
       if (unitInAction.playerId !== state.activePlayerId) return state;
       const newUnits = updateUnitsByMove(state.units, unitInAction, action.payload);
-      return { ...state, units: newUnits };
+      return { ...state, units: newUnits, history: [...state.history, action] };
     }
 
     case "DO_ATTACK": {
       const unitInAction = loadUnit(action.unitId, state.units);
       if (unitInAction.playerId !== state.activePlayerId) return state;
       const newUnits = updateUnitsByAttack(state.units, unitInAction, action.payload);
-      return { ...state, units: newUnits };
+      return { ...state, units: newUnits, history: [...state.history, action] };
+    }
+
+    case "UNDO_MOVE": {
+      const unit = loadUnit(action.unitId, state.units);
+      if (unit.playerId !== state.activePlayerId) return state;
+      if (!unit.status.moved) return state;
+      if (unit.status.attacked) return state;
+      const updatedUnit = {
+        ...unit,
+        status: {
+          ...unit.status,
+          coordinate: unit.status.initialCoordinate,
+          previousCoordinate: unit.status.initialCoordinate,
+          moved: false,
+        },
+      };
+      return { ...state, units: updateUnit(updatedUnit, state.units), history: [...state.history, action] };
     }
 
     case "TURN_END": {
@@ -172,6 +207,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
           ...state,
           phase: { type: "finished", winner: state.activePlayerId },
           units: resettedUnits,
+          history: [...state.history, action],
         };
       }
 
@@ -179,6 +215,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         ...state,
         activePlayerId: nextPlayerId,
         units: resettedUnits,
+        history: [...state.history, action],
       };
     }
 

@@ -4,10 +4,12 @@ export type ActionOptionType = typeof ACTION_OPTIONS[number]
 const ORIENTATIONS = ["UP", "DOWN", "LEFT", "RIGHT"] as const
 export type OrientationType = typeof ORIENTATIONS[number]
 
-const ACTIONS = ["OPEN_MENU", "CLOSE_MENU", "TURN_END", "SELECT_MOVE", "SELECT_ATTACK", "DO_MOVE", "DO_ATTACK", "ANIMATION_START_MOVE", "ANIMATION_START_ATTACK", "ANIMATION_START_TURN_CHANGE", "ANIMATION_COMPLETE"] as const
+const ACTIONS = ["OPEN_MENU", "CLOSE_MENU", "TURN_END", "SELECT_MOVE", "SELECT_ATTACK", "DO_MOVE", "DO_ATTACK", "UNDO_MOVE", "ANIMATION_START_MOVE", "ANIMATION_START_ATTACK", "ANIMATION_START_TURN_CHANGE", "ANIMATION_COMPLETE"] as const
 export type ActionType = typeof ACTIONS[number];
 
 export type UnitCategory = "fighter" | "tank" | "soldier"
+
+export type TerrainType = "plain" | "forest" | "mountain" | "water"
 
 // State
 export type UnitType = { spec: UnitSpecType, status: UnitStatusType, playerId: number }

@@ -95,6 +95,45 @@
     font-size: 8px;
   }
 
+  &-terrain-forest {
+    background-color: rgba(34, 120, 34, 0.4);
+    &::before {
+      content: "\1F332"; // 🌲
+      position: absolute;
+      font-size: 1.2rem;
+      opacity: 0.6;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &-terrain-mountain {
+    background-color: rgba(139, 119, 101, 0.4);
+    &::before {
+      content: "\26F0"; // ⛰
+      position: absolute;
+      font-size: 1.2rem;
+      opacity: 0.6;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &-terrain-water {
+    background-color: rgba(30, 80, 160, 0.5);
+    &::before {
+      content: "\1F30A"; // 🌊
+      position: absolute;
+      font-size: 1.2rem;
+      opacity: 0.4;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
   &-move-range {
     background: rgba(65, 105, 225, 0.4);
     border: 1px solid rgba(100, 150, 255, 0.6);
