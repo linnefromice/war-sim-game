@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "TeammateIdle": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'TaskListを確認して、未完了のタスクがあれば作業を続けてください。' >&2; exit 2"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'タスク完了。TaskListを確認して次の未着手タスクがあれば取り組んでください。' >&2; exit 2"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
