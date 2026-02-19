@@ -4,11 +4,11 @@ import { loadUnit } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { CELL_INTERVAL, GRID_OFFSET, STAGE_PADDING } from "./layoutConstants";
 
-const POSITION_CONFIGS = [
-  { showOnLeft: false, showAbove: false }, // right-below
-  { showOnLeft: false, showAbove: true },  // right-above
-  { showOnLeft: true, showAbove: true },   // left-above
-  { showOnLeft: true, showAbove: false },  // left-below
+const POSITION_CONFIGS: { showOnLeft: boolean; showAbove: boolean; label: string }[] = [
+  { showOnLeft: false, showAbove: false, label: "◸" }, // right-below (menu is at bottom-right of unit → arrow points top-left)
+  { showOnLeft: false, showAbove: true,  label: "◺" }, // right-above (menu is at top-right → arrow points bottom-left)
+  { showOnLeft: true, showAbove: true,   label: "◿" }, // left-above (menu is at top-left → arrow points bottom-right)
+  { showOnLeft: true, showAbove: false,  label: "◹" }, // left-below (menu is at bottom-left → arrow points top-right)
 ];
 
 export const ActionButtons = () => {
@@ -188,20 +188,19 @@ export const ActionButtons = () => {
       {/* Separator */}
       <div className="action-menu-separator" />
 
-      {/* Position toggle button */}
-      <button
-        className="action-menu-btn action-menu-btn-position"
-        onClick={() => {
-          if (positionOverride === null) {
-            // Start from position 0 (first fixed quadrant)
-            setPositionOverride(0);
-          } else {
-            setPositionOverride((positionOverride + 1) % POSITION_CONFIGS.length);
-          }
-        }}
-      >
-        ↻ 位置変更
-      </button>
+      {/* Position selector (2x2 grid) */}
+      <div className="action-menu-position-grid">
+        {POSITION_CONFIGS.map((config, idx) => (
+          <button
+            key={idx}
+            className={`action-menu-position-btn${positionOverride === idx ? " action-menu-position-btn--active" : ""}`}
+            onClick={() => setPositionOverride(positionOverride === idx ? null : idx)}
+            title={`${config.showAbove ? "上" : "下"}${config.showOnLeft ? "左" : "右"}`}
+          >
+            {config.label}
+          </button>
+        ))}
+      </div>
 
       {/* Close button */}
       <button
