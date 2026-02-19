@@ -211,11 +211,16 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         };
       }
 
+      const newTurnNumber = nextPlayerId === tutorialScenario.players[0].id
+        ? state.turnNumber + 1
+        : state.turnNumber;
+
       return {
         ...state,
         activePlayerId: nextPlayerId,
         units: resettedUnits,
         history: [...state.history, action],
+        turnNumber: newTurnNumber,
       };
     }
 

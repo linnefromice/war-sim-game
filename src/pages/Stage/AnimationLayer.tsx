@@ -31,6 +31,7 @@ const MoveAnimation = ({ unitType, from, to }: { unitType: UnitCategory; from: C
 
   return (
     <div
+      className="move-animation-marker"
       style={{
         position: "absolute",
         left: pos.left,
@@ -38,12 +39,6 @@ const MoveAnimation = ({ unitType, from, to }: { unitType: UnitCategory; from: C
         width: cellVisualSize,
         height: cellVisualSize,
         transition: `left ${MOVE_DURATION}ms ease-in-out, top ${MOVE_DURATION}ms ease-in-out`,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 8,
-        backgroundColor: "rgba(255, 255, 255, 0.6)",
-        zIndex: 10,
       }}
     >
       <UnitIcon unitType={unitType} className="" />
@@ -58,29 +53,21 @@ const AttackAnimation = ({ coord, damage }: { coord: Coordinate; damage: number 
   return (
     <>
       <div
-        className="attack-flash"
+        className="attack-flash attack-animation-marker"
         style={{
           position: "absolute",
           left: pos.left,
           top: pos.top,
           width: cellVisualSize,
           height: cellVisualSize,
-          borderRadius: 8,
-          backgroundColor: "rgba(255, 0, 0, 0.6)",
-          zIndex: 10,
         }}
       />
       <div
-        className="damage-float"
+        className="damage-float damage-float-text"
         style={{
           position: "absolute",
           left: pos.left + cellVisualSize / 2,
           top: pos.top,
-          color: "red",
-          fontWeight: "bold",
-          fontSize: "1.25rem",
-          zIndex: 11,
-          pointerEvents: "none",
         }}
       >
         {`-${damage}`}
@@ -129,7 +116,7 @@ export const AnimationLayer = () => {
   if (animationState.type === "move") {
     const unit = loadUnit(animationState.unitId, gameState.units);
     return (
-      <div className="animation-layer" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+      <div className="animation-layer">
         <MoveAnimation unitType={unit.spec.unit_type} from={animationState.from} to={animationState.to} />
       </div>
     );
@@ -138,7 +125,7 @@ export const AnimationLayer = () => {
   if (animationState.type === "attack") {
     const target = loadUnit(animationState.targetId, gameState.units);
     return (
-      <div className="animation-layer" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+      <div className="animation-layer">
         <AttackAnimation coord={target.status.coordinate} damage={animationState.damage} />
       </div>
     );
@@ -146,7 +133,7 @@ export const AnimationLayer = () => {
 
   if (animationState.type === "turn_change") {
     return (
-      <div className="animation-layer" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+      <div className="animation-layer">
         <TurnChangeAnimation nextPlayerId={animationState.nextPlayerId} />
       </div>
     );

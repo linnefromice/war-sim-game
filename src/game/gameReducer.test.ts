@@ -56,6 +56,7 @@ const makeGameState = (overrides?: Partial<GameState>): GameState => ({
   ],
   phase: { type: "playing" },
   history: [],
+  turnNumber: 1,
   ...overrides,
 });
 
@@ -378,6 +379,38 @@ describe("gameReducer", () => {
       const unit = result.units.find((u: UnitType) => u.spec.id === 1)!;
       // 195 + 20 = 215, capped to 200
       expect(unit.status.en).toBe(200);
+    });
+
+    it("turnNumber starts at 1", () => {
+      const state = makeGameState();
+      expect(state.turnNumber).toBe(1);
+    });
+
+    it("turnNumber increments after full round (both players end turn)", () => {
+      const state = makeGameState({
+        activePlayerId: 1,
+        turnNumber: 1,
+      });
+      // Player 1 ends turn -> activePlayer becomes 2, turnNumber stays 1
+      const afterP1 = gameReducer(state, { type: "TURN_END" });
+      expect(afterP1.activePlayerId).toBe(2);
+      expect(afterP1.turnNumber).toBe(1);
+
+      // Player 2 ends turn -> activePlayer becomes 1, turnNumber increments to 2
+      const afterP2 = gameReducer(afterP1, { type: "TURN_END" });
+      expect(afterP2.activePlayerId).toBe(1);
+      expect(afterP2.turnNumber).toBe(2);
+    });
+
+    it("turnNumber does NOT increment after just one player ends turn", () => {
+      const state = makeGameState({
+        activePlayerId: 1,
+        turnNumber: 3,
+      });
+      // Player 1 ends turn -> switches to Player 2, turnNumber stays 3
+      const result = gameReducer(state, { type: "TURN_END" });
+      expect(result.activePlayerId).toBe(2);
+      expect(result.turnNumber).toBe(3);
     });
   });
 

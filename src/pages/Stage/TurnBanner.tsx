@@ -29,6 +29,7 @@ export const TurnBanner = () => {
 
       {/* Center: active turn indicator */}
       <div className="turn-banner-center">
+        <span className="turn-banner-turn-number">TURN {gameState.turnNumber}</span>
         <span
           className="turn-banner-center-name"
           style={{ color: `rgb(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]})` }}

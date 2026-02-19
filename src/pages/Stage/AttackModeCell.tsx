@@ -1,9 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ActionContext } from ".";
-import { loadUnit } from "../../game/gameReducer";
+import { getTerrainDefenseReduction, loadUnit } from "../../game/gameReducer";
 import { CellWithUnit } from "./CellWithUnit";
+import { TerrainTooltip } from "./TerrainTooltip";
 import { isWithinRange } from "./cellUtils";
 import { tutorialScenario } from "../../scenarios/tutorial";
+
+const TERRAIN_LABELS: Record<string, string> = {
+  plain: "平地",
+  forest: "森林",
+  mountain: "山岳",
+  water: "水域",
+};
 
 const getTerrainClass = (x: number, y: number): string => {
   const terrain = tutorialScenario.terrain[y][x];
@@ -17,6 +25,7 @@ const getTerrainClass = (x: number, y: number): string => {
 
 export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selectedArmamentIdx }: { x: number, y: number, unitId?: number, targetUnitId: number, selectedArmamentIdx: number }) => {
   const { gameState: { units }, dispatch } = useContext(ActionContext);
+  const [hovered, setHovered] = useState(false);
   const targetUnit = loadUnit(targetUnitId, units);
   const { spec, status } = targetUnit;
   const attack_range = spec.armaments[selectedArmamentIdx].range;
@@ -27,13 +36,17 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
       const target = loadUnit(unitId, units);
       const weapon = spec.armaments[selectedArmamentIdx];
       const targetTerrain = tutorialScenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
-      const defenseReduction = targetTerrain === "forest" ? 0.2 : targetTerrain === "mountain" ? 0.4 : 0;
+      const defenseReduction = getTerrainDefenseReduction(targetTerrain);
       const predictedDamage = Math.floor(weapon.value * (1 - defenseReduction));
       const remainingHp = Math.max(0, target.status.hp - predictedDamage);
       const isLethal = remainingHp === 0;
 
       return (
-        <div style={{ position: "relative" }}>
+        <div
+          className="cell-attack-target-wrapper"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
           <CellWithUnit
             unitId={unitId}
             onClick={() => dispatch({
@@ -47,25 +60,15 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
               }
             })}
           />
-          <div
-            className="damage-preview"
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              backgroundColor: isLethal ? "rgba(255, 0, 0, 0.85)" : "rgba(255, 100, 0, 0.75)",
-              color: "white",
-              fontSize: "0.65rem",
-              fontWeight: "bold",
-              padding: "1px 3px",
-              borderRadius: "2px",
-              pointerEvents: "none",
-              lineHeight: 1.2,
-            }}
-          >
-            <div>{`-${predictedDamage}`}</div>
-            <div style={{ fontSize: "0.55rem" }}>{`\u2192${remainingHp}`}</div>
-            {isLethal && <div style={{ fontSize: "0.6rem" }}>&#x1F480;</div>}
+          <div className={`damage-preview${isLethal ? " damage-preview--lethal" : ""}`}>
+            <div className="damage-preview-damage">{`-${predictedDamage} HP`}</div>
+            <div className="damage-preview-remaining">{`\u2192 ${remainingHp} HP`}</div>
+            {defenseReduction > 0 && (
+              <div className="damage-preview-terrain">
+                {TERRAIN_LABELS[targetTerrain]} DEF {Math.round(defenseReduction * 100)}%
+              </div>
+            )}
+            {isLethal && <div className="damage-preview-lethal">DESTROY</div>}
           </div>
         </div>
       );
@@ -73,8 +76,12 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
 
     return <div
       className="cell cell-attack-range"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onClick={() => dispatch({ type: "CLOSE_MENU" })}
-    />; // NOTE: not to attack
+    >
+      {hovered && <TerrainTooltip x={x} y={y} />}
+    </div>; // NOTE: not to attack
   }
 
   if (unitId) {
@@ -87,7 +94,11 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
   return (
     <div
       className={`cell${getTerrainClass(x, y)}`}
-    />
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {hovered && <TerrainTooltip x={x} y={y} />}
+    </div>
   );
 });
 
