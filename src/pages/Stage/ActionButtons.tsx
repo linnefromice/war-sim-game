@@ -1,8 +1,15 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { CELL_INTERVAL, GRID_OFFSET, STAGE_PADDING } from "./layoutConstants";
+
+const POSITION_CONFIGS = [
+  { showOnLeft: false, showAbove: false }, // right-below
+  { showOnLeft: false, showAbove: true },  // right-above
+  { showOnLeft: true, showAbove: true },   // left-above
+  { showOnLeft: true, showAbove: false },  // left-below
+];
 
 export const ActionButtons = () => {
   const {
@@ -11,9 +18,15 @@ export const ActionButtons = () => {
     dispatch,
   } = useContext(ActionContext);
   const [isAttacking, setIsAttacking] = useState(false);
+  const [positionOverride, setPositionOverride] = useState<number | null>(null);
   const scenario = useScenario();
 
   const targetUnitId = actionMenu.targetUnitId;
+
+  // Reset position override when selected unit changes
+  useEffect(() => {
+    setPositionOverride(null);
+  }, [targetUnitId]);
 
   const menuPosition = useMemo(() => {
     if (!targetUnitId) return { top: 0, left: 0, transform: "none" };
@@ -23,8 +36,15 @@ export const ActionButtons = () => {
     const gridCols = scenario.gridSize.cols;
     const gridRows = scenario.gridSize.rows;
 
-    const showOnLeft = coord.x >= Math.ceil(gridCols / 2);
-    const showAbove = coord.y >= Math.ceil(gridRows / 2);
+    let showOnLeft: boolean;
+    let showAbove: boolean;
+
+    if (positionOverride !== null) {
+      ({ showOnLeft, showAbove } = POSITION_CONFIGS[positionOverride]);
+    } else {
+      showOnLeft = coord.x >= Math.ceil(gridCols / 2);
+      showAbove = coord.y >= Math.ceil(gridRows / 2);
+    }
 
     const transformParts: string[] = [];
 
@@ -49,7 +69,7 @@ export const ActionButtons = () => {
       left,
       transform: transformParts.length > 0 ? transformParts.join(" ") : "none",
     };
-  }, [targetUnitId, units, scenario.gridSize]);
+  }, [targetUnitId, units, scenario.gridSize, positionOverride]);
 
   if (!targetUnitId) return <></>;
 
@@ -168,12 +188,19 @@ export const ActionButtons = () => {
       {/* Separator */}
       <div className="action-menu-separator" />
 
-      {/* End Turn button */}
+      {/* Position toggle button */}
       <button
-        className="action-menu-btn action-menu-btn-end-turn"
-        onClick={() => dispatch({ type: "TURN_END" })}
+        className="action-menu-btn action-menu-btn-position"
+        onClick={() => {
+          if (positionOverride === null) {
+            // Start from position 0 (first fixed quadrant)
+            setPositionOverride(0);
+          } else {
+            setPositionOverride((positionOverride + 1) % POSITION_CONFIGS.length);
+          }
+        }}
       >
-        確定
+        ↻ 位置変更
       </button>
 
       {/* Close button */}

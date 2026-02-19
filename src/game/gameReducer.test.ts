@@ -226,7 +226,7 @@ describe("gameReducer", () => {
       expect(target.status.hp).toBe(800); // 1000 - 200
       expect(attacker.status.en).toBe(150); // 200 - 50
       expect(attacker.status.attacked).toBe(true);
-      expect(attacker.status.moved).toBe(true); // can't move after attack
+      expect(attacker.status.moved).toBe(false); // attack does not consume movement
     });
 
     it("removes target unit when HP drops to 0 or below", () => {
@@ -262,6 +262,70 @@ describe("gameReducer", () => {
       expect(attacker.status.en).toBe(10);
       expect(target.status.hp).toBe(1000);
       expect(attacker.status.attacked).toBe(false);
+    });
+
+    it("allows move after attack", () => {
+      const state = makeGameState();
+      // Attack first
+      const afterAttack = gameReducer(state, {
+        type: "DO_ATTACK",
+        unitId: 1,
+        payload: { target_unit_id: 2, armament_idx: 0 },
+      });
+      const attackerAfterAttack = afterAttack.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(attackerAfterAttack.status.attacked).toBe(true);
+      expect(attackerAfterAttack.status.moved).toBe(false);
+
+      // Then move
+      const afterMove = gameReducer(afterAttack, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 4, y: 7 },
+      });
+      const attackerAfterMove = afterMove.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(attackerAfterMove.status.coordinate).toEqual({ x: 4, y: 7 });
+      expect(attackerAfterMove.status.moved).toBe(true);
+      expect(attackerAfterMove.status.attacked).toBe(true);
+    });
+
+    it("allows attack after move", () => {
+      const state = makeGameState();
+      // Move first
+      const afterMove = gameReducer(state, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 4, y: 7 },
+      });
+      const unitAfterMove = afterMove.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unitAfterMove.status.moved).toBe(true);
+      expect(unitAfterMove.status.attacked).toBe(false);
+
+      // Then attack
+      const afterAttack = gameReducer(afterMove, {
+        type: "DO_ATTACK",
+        unitId: 1,
+        payload: { target_unit_id: 2, armament_idx: 0 },
+      });
+      const unitAfterAttack = afterAttack.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unitAfterAttack.status.moved).toBe(true);
+      expect(unitAfterAttack.status.attacked).toBe(true);
+    });
+
+    it("attack-then-move sequence sets both flags", () => {
+      const state = makeGameState();
+      const afterAttack = gameReducer(state, {
+        type: "DO_ATTACK",
+        unitId: 1,
+        payload: { target_unit_id: 2, armament_idx: 0 },
+      });
+      const afterMove = gameReducer(afterAttack, {
+        type: "DO_MOVE",
+        unitId: 1,
+        payload: { x: 4, y: 7 },
+      });
+      const unit = afterMove.units.find((u: UnitType) => u.spec.id === 1)!;
+      expect(unit.status.moved).toBe(true);
+      expect(unit.status.attacked).toBe(true);
     });
 
     it("rejects attack if unit belongs to another player", () => {

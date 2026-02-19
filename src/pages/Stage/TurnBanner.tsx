@@ -6,7 +6,7 @@ import { useScenario } from "../../contexts/ScenarioContext";
 const AI_PLAYER_ID = 2;
 
 export const TurnBanner = () => {
-  const { gameState } = useContext(ActionContext);
+  const { gameState, uiState, dispatch } = useContext(ActionContext);
   const scenario = useScenario();
 
   const activePlayer = getPlayer(gameState.activePlayerId, scenario.players);
@@ -14,6 +14,11 @@ export const TurnBanner = () => {
   const player2 = scenario.players[1];
   const player1Units = gameState.units.filter(u => u.playerId === 1);
   const player2Units = gameState.units.filter(u => u.playerId === 2);
+
+  const isEndTurnDisabled =
+    gameState.activePlayerId === AI_PLAYER_ID ||
+    uiState.animationState.type !== "idle" ||
+    gameState.phase.type === "finished";
 
   return (
     <div className="turn-banner">
@@ -41,6 +46,13 @@ export const TurnBanner = () => {
         {gameState.activePlayerId === AI_PLAYER_ID && (
           <span className="turn-banner-ai-badge">AI</span>
         )}
+        <button
+          className="turn-banner-end-turn-btn"
+          onClick={() => dispatch({ type: "TURN_END" })}
+          disabled={isEndTurnDisabled}
+        >
+          確定
+        </button>
       </div>
 
       {/* Right badge */}

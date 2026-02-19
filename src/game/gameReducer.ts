@@ -137,7 +137,6 @@ const updateUnitsByAttack = (
     status: {
       ...unitInAction.status,
       en: remainEn,
-      moved: true,
       attacked: true,
     },
   };

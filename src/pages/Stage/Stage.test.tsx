@@ -49,7 +49,8 @@ describe("Stage component tests (full scenario)", () => {
     // Click the first Player 1 unit
     await user.click(unitCellsInRow8[0]);
 
-    // Action menu should appear with buttons: 移動, 攻撃, 確定, 閉じる
+    // Action menu should appear with buttons: 移動, 攻撃, 閉じる
+    // 確定 (End Turn) is always visible in TurnBanner
     expect(screen.getByText("移動")).toBeInTheDocument();
     expect(screen.getByText("攻撃")).toBeInTheDocument();
     expect(screen.getByText("確定")).toBeInTheDocument();
@@ -91,10 +92,12 @@ describe("Stage component tests (full scenario)", () => {
       vi.advanceTimersByTime(MOVE_DURATION);
     });
 
-    // After movement, the action menu should close (no 移動 button visible)
-    expect(screen.queryByText("移動")).not.toBeInTheDocument();
+    // After movement, the menu re-opens because the unit can still attack
+    const moveBtn = screen.queryByText("移動");
+    expect(moveBtn).toBeInTheDocument();
+    expect((moveBtn as HTMLButtonElement).disabled).toBe(true); // moved=true, so disabled
 
-    // Move range cells should disappear
+    // Move range cells should disappear (no longer in move mode)
     const moveRangeCellsAfter = container.querySelectorAll(".cell-move-range");
     expect(moveRangeCellsAfter.length).toBe(0);
   });

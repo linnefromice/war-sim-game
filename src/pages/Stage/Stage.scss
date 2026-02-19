@@ -63,6 +63,33 @@
     color: var(--color-accent-red);
     letter-spacing: 0.1em;
   }
+
+  &-end-turn-btn {
+    padding: 6px 16px;
+    background-color: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: var(--radius-sm);
+    color: #fbbf24;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, transform 80ms ease;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(245, 158, 11, 0.3);
+      border-color: var(--color-accent-amber);
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
 }
 
 // ============================================================
@@ -327,6 +354,20 @@
     &:hover:not(:disabled) {
       background-color: rgba(245, 158, 11, 0.3);
       border-color: var(--color-accent-amber);
+    }
+  }
+
+  // Position toggle - ghost with cyan accent
+  &-position {
+    background-color: transparent;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    color: var(--color-text-muted);
+    font-size: 12px;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 212, 255, 0.08);
+      border-color: rgba(0, 212, 255, 0.4);
+      color: var(--color-accent-cyan);
     }
   }
 
