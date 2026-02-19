@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ActionContext } from ".";
 import { CellWithUnit } from "./CellWithUnit";
+import { TerrainTooltip } from "./TerrainTooltip";
 import { tutorialScenario } from "../../scenarios/tutorial";
 
 const getTerrainClass = (x: number, y: number): string => {
@@ -15,6 +16,8 @@ const getTerrainClass = (x: number, y: number): string => {
 
 export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, unitId?: number }) => {
   const { dispatch } = useContext(ActionContext);
+  const [hovered, setHovered] = useState(false);
+
   if (unitId) {
     return <CellWithUnit
       unitId={unitId}
@@ -28,7 +31,11 @@ export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, un
   return (
     <div
       className={`cell${getTerrainClass(x, y)}`}
-    />
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {hovered && <TerrainTooltip x={x} y={y} />}
+    </div>
   );
 });
 

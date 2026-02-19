@@ -1,16 +1,16 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from "react";
 import "./Stage.scss"
 import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
 import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState, GameAction } from "../../game/types";
-import { gameReducer, getPlayer, getTerrainDefenseReduction, loadUnit, nextPlayer } from "../../game/gameReducer";
+import { gameReducer, getTerrainDefenseReduction, loadUnit, nextPlayer } from "../../game/gameReducer";
 import { ActionButtons } from "./ActionButtons";
 import { UnitDetailPanel } from "./UnitDetailPanel";
 import { TurnBanner } from "./TurnBanner";
 import { AnimationLayer } from "./AnimationLayer";
-import { ReplayViewer } from "./ReplayViewer";
+import { GameOverOverlay } from "./GameOverOverlay";
 import { AIAction, computeAIActions } from "../../game/ai";
 
 const AI_PLAYER_ID = 2;
@@ -28,6 +28,7 @@ const initialGameState: GameState = {
   units: tutorialScenario.units,
   phase: { type: "playing" },
   history: [],
+  turnNumber: 1,
 };
 
 export const ActionContext = createContext<{
@@ -291,89 +292,3 @@ const StageContent = () => {
   );
 };
 
-const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
-  const winner = getPlayer(winnerId, tutorialScenario.players);
-  const { gameState, onRestart } = useContext(ActionContext);
-  const [showReplay, setShowReplay] = useState(false);
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1000,
-      }}
-    >
-      <div
-        style={{
-          color: "white",
-          fontSize: "3rem",
-          fontWeight: "bold",
-          textAlign: "center",
-        }}
-      >
-        <p>{`Player ${winner.id} Wins!`}</p>
-        <p style={{ fontSize: "1.5rem" }}>{winner.name}</p>
-        <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginTop: "2rem" }}>
-          <button
-            onClick={onRestart}
-            style={{
-              padding: "1rem 2rem",
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              color: "white",
-              backgroundColor: "transparent",
-              border: "2px solid white",
-              borderRadius: "0.5rem",
-              cursor: "pointer",
-              transition: "background-color 0.3s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-            }}
-          >
-            Restart
-          </button>
-          <button
-            onClick={() => setShowReplay(true)}
-            style={{
-              padding: "1rem 2rem",
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              color: "white",
-              backgroundColor: "transparent",
-              border: "2px solid white",
-              borderRadius: "0.5rem",
-              cursor: "pointer",
-              transition: "background-color 0.3s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-            }}
-          >
-            リプレイ
-          </button>
-        </div>
-      </div>
-      {showReplay && (
-        <ReplayViewer
-          history={gameState.history}
-          initialUnits={tutorialScenario.units}
-          onClose={() => setShowReplay(false)}
-        />
-      )}
-    </div>
-  );
-};

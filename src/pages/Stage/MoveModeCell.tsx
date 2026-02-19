@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ActionContext } from ".";
 import { loadUnit } from "../../game/gameReducer";
 import { CellWithUnit } from "./CellWithUnit";
+import { TerrainTooltip } from "./TerrainTooltip";
 import { isWithinMoveRange } from "./cellUtils";
 import { tutorialScenario } from "../../scenarios/tutorial";
 
@@ -17,6 +18,7 @@ const getTerrainClass = (x: number, y: number): string => {
 
 export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: number, y: number, unitId?: number, targetUnitId: number }) => {
   const { gameState: { units }, dispatch } = useContext(ActionContext);
+  const [hovered, setHovered] = useState(false);
   const targetUnit = loadUnit(targetUnitId, units);
   const { spec, status } = targetUnit;
 
@@ -28,6 +30,8 @@ export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: num
         /> // NOTE: unable to move where the unit is.
       : <div
           className="cell cell-move-range"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
           onClick={
             () => dispatch({
               type: "DO_MOVE",
@@ -40,7 +44,9 @@ export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: num
               }
             })
           }
-        />;
+        >
+          {hovered && <TerrainTooltip x={x} y={y} />}
+        </div>;
   }
 
   if (unitId) {
@@ -53,7 +59,11 @@ export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: num
   return (
     <div
       className={`cell${getTerrainClass(x, y)}`}
-    />
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {hovered && <TerrainTooltip x={x} y={y} />}
+    </div>
   );
 });
 

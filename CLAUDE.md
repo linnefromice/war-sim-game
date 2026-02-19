@@ -136,3 +136,17 @@ Action menu labels are in Japanese: 移動 (Move), 攻撃 (Attack), 確定 (End 
 
 - 2人の Teammate が同一ファイルを編集しないよう、担当範囲を分割する
 - 共有ファイルへの変更が必要な場合は、事前に担当者間で調整する
+
+
+
+## User Customization
+
+If a `CLAUDE.local.md` file exists in the root directory, read it and **prioritize its
+instructions over this file**. This allows individual developers to customize AI behavior
+without affecting team-shared rules.
+
+Example use cases for `CLAUDE.local.md`:
+- Personal coding style preferences
+- Local environment-specific configurations
+- Custom workflow instructions
+- Development focus areas

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import "./ReplayViewer.scss";
 import { GameAction, GameState } from "../../game/types";
 import { gameReducer, loadUnit } from "../../game/gameReducer";
 import { UnitType } from "../../types";
@@ -25,6 +26,14 @@ const formatAction = (action: GameAction, units: UnitType[]): string => {
   }
 };
 
+const getItemClassName = (index: number, currentStep: number): string => {
+  const base = "replay-item";
+  if (index === currentStep) return `${base} ${base}--active`;
+  if (currentStep >= 0 && index < currentStep) return `${base} ${base}--past`;
+  if (currentStep >= 0 && index > currentStep) return `${base} ${base}--future`;
+  return base;
+};
+
 export const ReplayViewer = ({
   history,
   initialUnits,
@@ -45,6 +54,7 @@ export const ReplayViewer = ({
     units: initialUnits,
     phase: { type: "playing" },
     history: [],
+    turnNumber: 1,
   };
   states.push(currentState);
   for (const action of history) {
@@ -77,94 +87,30 @@ export const ReplayViewer = ({
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0,0,0,0.8)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1001,
-      }}
-    >
-      <div
-        style={{
-          background: "rgba(20,20,35,0.95)",
-          borderRadius: 12,
-          padding: 24,
-          maxWidth: 500,
-          width: "90%",
-          maxHeight: "80vh",
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-          color: "white",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-          backdropFilter: "blur(8px)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <h3 style={{ margin: 0, fontSize: "1.2rem" }}>リプレイ</h3>
-          <span style={{ color: "gray", fontSize: "0.85rem" }}>
+    <div className="replay-overlay">
+      <div className="replay-panel">
+        <div className="replay-header">
+          <h3 className="replay-header-title">リプレイ</h3>
+          <span className="replay-header-counter">
             {currentStep >= 0
               ? `${currentStep + 1}/${history.length}`
               : `0/${history.length}`}
           </span>
         </div>
-        <div
-          ref={listRef}
-          style={{
-            flex: 1,
-            overflow: "auto",
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-            minHeight: 200,
-          }}
-        >
+        <div ref={listRef} className="replay-list">
           {history.map((action, i) => {
             const state = states[i]; // state BEFORE this action
             const activePlayer = tutorialScenario.players.find(
               (p) => p.id === state.activePlayerId
             );
             return (
-              <div
-                key={i}
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 6,
-                  fontSize: "0.85rem",
-                  backgroundColor:
-                    i === currentStep
-                      ? "rgba(65,105,225,0.3)"
-                      : i < currentStep
-                        ? "rgba(255,255,255,0.05)"
-                        : "transparent",
-                  borderLeft:
-                    i === currentStep
-                      ? "3px solid #4169E1"
-                      : "3px solid transparent",
-                  opacity: currentStep >= 0 && i > currentStep ? 0.4 : 1,
-                  transition: "all 0.2s",
-                }}
-              >
+              <div key={i} className={getItemClassName(i, currentStep)}>
                 <span
+                  className="replay-item-player"
                   style={{
                     color: activePlayer
                       ? `rgb(${activePlayer.rgb[0]},${activePlayer.rgb[1]},${activePlayer.rgb[2]})`
-                      : "white",
-                    fontWeight: 600,
-                    marginRight: 8,
+                      : undefined,
                   }}
                 >
                   {activePlayer?.name}
@@ -174,50 +120,24 @@ export const ReplayViewer = ({
             );
           })}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="replay-controls">
           <button
+            className="replay-btn replay-btn--play"
             onClick={handlePlay}
             disabled={isPlaying}
-            style={{
-              flex: 1,
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid rgba(65,105,225,0.5)",
-              backgroundColor: "rgba(65,105,225,0.2)",
-              color: "#93b4ff",
-              cursor: isPlaying ? "not-allowed" : "pointer",
-              opacity: isPlaying ? 0.5 : 1,
-            }}
           >
             再生
           </button>
           <button
+            className="replay-btn replay-btn--stop"
             onClick={() => setIsPlaying(false)}
             disabled={!isPlaying}
-            style={{
-              flex: 1,
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid rgba(255,255,255,0.2)",
-              backgroundColor: "rgba(255,255,255,0.08)",
-              color: "white",
-              cursor: !isPlaying ? "not-allowed" : "pointer",
-              opacity: !isPlaying ? 0.5 : 1,
-            }}
           >
             停止
           </button>
           <button
+            className="replay-btn replay-btn--close"
             onClick={onClose}
-            style={{
-              flex: 1,
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid rgba(255,255,255,0.2)",
-              backgroundColor: "transparent",
-              color: "rgba(255,255,255,0.6)",
-              cursor: "pointer",
-            }}
           >
             閉じる
           </button>

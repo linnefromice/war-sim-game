@@ -9,6 +9,7 @@ export type GameState = {
   units: UnitType[];
   phase: GamePhase;
   history: GameAction[];
+  turnNumber: number;
 }
 
 export type GameAction =
