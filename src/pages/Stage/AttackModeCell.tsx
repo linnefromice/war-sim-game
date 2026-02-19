@@ -4,7 +4,8 @@ import { getTerrainDefenseReduction, loadUnit } from "../../game/gameReducer";
 import { CellWithUnit } from "./CellWithUnit";
 import { TerrainTooltip } from "./TerrainTooltip";
 import { isWithinRange } from "./cellUtils";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
+import { TerrainType } from "../../types";
 
 const TERRAIN_LABELS: Record<string, string> = {
   plain: "平地",
@@ -13,8 +14,7 @@ const TERRAIN_LABELS: Record<string, string> = {
   water: "水域",
 };
 
-const getTerrainClass = (x: number, y: number): string => {
-  const terrain = tutorialScenario.terrain[y][x];
+const getTerrainClass = (terrain: TerrainType): string => {
   switch (terrain) {
     case "forest": return " cell-terrain-forest";
     case "mountain": return " cell-terrain-mountain";
@@ -25,6 +25,7 @@ const getTerrainClass = (x: number, y: number): string => {
 
 export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selectedArmamentIdx }: { x: number, y: number, unitId?: number, targetUnitId: number, selectedArmamentIdx: number }) => {
   const { gameState: { units }, dispatch } = useContext(ActionContext);
+  const scenario = useScenario();
   const [hovered, setHovered] = useState(false);
   const targetUnit = loadUnit(targetUnitId, units);
   const { spec, status } = targetUnit;
@@ -35,7 +36,7 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
       // Calculate damage preview with terrain defense
       const target = loadUnit(unitId, units);
       const weapon = spec.armaments[selectedArmamentIdx];
-      const targetTerrain = tutorialScenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
+      const targetTerrain = scenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
       const defenseReduction = getTerrainDefenseReduction(targetTerrain);
       const predictedDamage = Math.floor(weapon.value * (1 - defenseReduction));
       const remainingHp = Math.max(0, target.status.hp - predictedDamage);
@@ -93,7 +94,7 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
 
   return (
     <div
-      className={`cell${getTerrainClass(x, y)}`}
+      className={`cell${getTerrainClass(scenario.terrain[y][x])}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

@@ -1,16 +1,17 @@
 import { useContext } from "react";
 import { ActionContext } from "./index";
 import { getPlayer } from "../../game/gameReducer";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 
 const AI_PLAYER_ID = 2;
 
 export const TurnBanner = () => {
   const { gameState } = useContext(ActionContext);
+  const scenario = useScenario();
 
-  const activePlayer = getPlayer(gameState.activePlayerId, tutorialScenario.players);
-  const player1 = tutorialScenario.players[0];
-  const player2 = tutorialScenario.players[1];
+  const activePlayer = getPlayer(gameState.activePlayerId, scenario.players);
+  const player1 = scenario.players[0];
+  const player2 = scenario.players[1];
   const player1Units = gameState.units.filter(u => u.playerId === 1);
   const player2Units = gameState.units.filter(u => u.playerId === 2);
 

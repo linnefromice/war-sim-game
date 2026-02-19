@@ -3,7 +3,7 @@ import "./ReplayViewer.scss";
 import { GameAction, GameState } from "../../game/types";
 import { gameReducer, loadUnit } from "../../game/gameReducer";
 import { UnitType } from "../../types";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 
 const formatAction = (action: GameAction, units: UnitType[]): string => {
   switch (action.type) {
@@ -43,6 +43,7 @@ export const ReplayViewer = ({
   initialUnits: UnitType[];
   onClose: () => void;
 }) => {
+  const scenario = useScenario();
   const [currentStep, setCurrentStep] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -100,7 +101,7 @@ export const ReplayViewer = ({
         <div ref={listRef} className="replay-list">
           {history.map((action, i) => {
             const state = states[i]; // state BEFORE this action
-            const activePlayer = tutorialScenario.players.find(
+            const activePlayer = scenario.players.find(
               (p) => p.id === state.activePlayerId
             );
             return (

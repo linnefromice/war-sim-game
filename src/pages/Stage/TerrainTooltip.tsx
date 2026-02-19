@@ -1,6 +1,6 @@
 import React from "react";
 import { TerrainType } from "../../types";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 
 const TERRAIN_LABELS: Record<TerrainType, string> = {
   plain: "平地",
@@ -24,7 +24,8 @@ const TERRAIN_MOVE_COST: Record<TerrainType, string> = {
 };
 
 export const TerrainTooltip = React.memo(({ x, y }: { x: number; y: number }) => {
-  const terrain = tutorialScenario.terrain[y][x];
+  const scenario = useScenario();
+  const terrain = scenario.terrain[y][x];
 
   return (
     <div className="terrain-tooltip">

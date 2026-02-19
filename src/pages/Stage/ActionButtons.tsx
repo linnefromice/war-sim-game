@@ -1,7 +1,7 @@
 import { useContext, useMemo, useState } from "react";
 import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 import { CELL_INTERVAL, GRID_OFFSET, STAGE_PADDING } from "./layoutConstants";
 
 export const ActionButtons = () => {
@@ -11,6 +11,7 @@ export const ActionButtons = () => {
     dispatch,
   } = useContext(ActionContext);
   const [isAttacking, setIsAttacking] = useState(false);
+  const scenario = useScenario();
 
   const targetUnitId = actionMenu.targetUnitId;
 
@@ -19,8 +20,8 @@ export const ActionButtons = () => {
 
     const { status: unitStatus } = loadUnit(targetUnitId, units);
     const coord = unitStatus.coordinate;
-    const gridCols = tutorialScenario.gridSize.cols;
-    const gridRows = tutorialScenario.gridSize.rows;
+    const gridCols = scenario.gridSize.cols;
+    const gridRows = scenario.gridSize.rows;
 
     const showOnLeft = coord.x >= Math.ceil(gridCols / 2);
     const showAbove = coord.y >= Math.ceil(gridRows / 2);
@@ -48,7 +49,7 @@ export const ActionButtons = () => {
       left,
       transform: transformParts.length > 0 ? transformParts.join(" ") : "none",
     };
-  }, [targetUnitId, units]);
+  }, [targetUnitId, units, scenario.gridSize]);
 
   if (!targetUnitId) return <></>;
 

@@ -12,6 +12,7 @@ import { TurnBanner } from "./TurnBanner";
 import { AnimationLayer } from "./AnimationLayer";
 import { GameOverOverlay } from "./GameOverOverlay";
 import { AIAction, computeAIActions } from "../../game/ai";
+import { ScenarioProvider } from "../../contexts/ScenarioContext";
 
 const AI_PLAYER_ID = 2;
 
@@ -143,9 +144,11 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
   };
 
   return (
-    <ActionContext.Provider value={{ gameState, uiState, dispatch, onRestart }}>
-      <StageContent />
-    </ActionContext.Provider>
+    <ScenarioProvider scenario={tutorialScenario}>
+      <ActionContext.Provider value={{ gameState, uiState, dispatch, onRestart }}>
+        <StageContent />
+      </ActionContext.Provider>
+    </ScenarioProvider>
   );
 };
 

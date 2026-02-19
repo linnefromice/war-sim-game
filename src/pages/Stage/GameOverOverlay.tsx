@@ -2,11 +2,12 @@ import { useContext, useState } from "react";
 import "./GameOverOverlay.scss";
 import { ActionContext } from "./index";
 import { getPlayer } from "../../game/gameReducer";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 import { ReplayViewer } from "./ReplayViewer";
 
 export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
-  const winner = getPlayer(winnerId, tutorialScenario.players);
+  const scenario = useScenario();
+  const winner = getPlayer(winnerId, scenario.players);
   const { gameState, onRestart } = useContext(ActionContext);
   const [showReplay, setShowReplay] = useState(false);
 
@@ -27,7 +28,7 @@ export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
       {showReplay && (
         <ReplayViewer
           history={gameState.history}
-          initialUnits={tutorialScenario.units}
+          initialUnits={scenario.units}
           onClose={() => setShowReplay(false)}
         />
       )}
