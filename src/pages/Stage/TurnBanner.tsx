@@ -1,13 +1,15 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ActionContext } from "./index";
 import { getPlayer } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
+import { saveGame } from "../../game/saveLoad";
 
 const AI_PLAYER_ID = 2;
 
 export const TurnBanner = () => {
-  const { gameState, uiState, dispatch } = useContext(ActionContext);
+  const { gameState, uiState, dispatch, difficulty } = useContext(ActionContext);
   const scenario = useScenario();
+  const [saveFlash, setSaveFlash] = useState(false);
 
   const activePlayer = getPlayer(gameState.activePlayerId, scenario.players);
   const player1 = scenario.players[0];
@@ -52,6 +54,19 @@ export const TurnBanner = () => {
           disabled={isEndTurnDisabled}
         >
           確定
+        </button>
+        <button
+          className="turn-banner-end-turn-btn"
+          onClick={() => {
+            if (difficulty) {
+              saveGame(gameState, difficulty);
+              setSaveFlash(true);
+              setTimeout(() => setSaveFlash(false), 1500);
+            }
+          }}
+          disabled={gameState.phase.type === "finished" || uiState.animationState.type !== "idle"}
+        >
+          {saveFlash ? "保存済" : "保存"}
         </button>
       </div>
 

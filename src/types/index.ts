@@ -27,6 +27,7 @@ export type StateActionMenuType = {
   selectedArmamentIdx: number | null // temp: only for SELECT_ATTACK
   animationState: AnimationState
   inspectedUnitId: number | null
+  cursorPosition: Coordinate | null
 }
 
 export type PayloadType = {

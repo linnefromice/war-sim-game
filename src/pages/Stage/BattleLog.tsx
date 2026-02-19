@@ -21,6 +21,8 @@ const formatAction = (action: GameAction, unitNameMap: Map<number, string>): str
       const name = unitNameMap.get(action.unitId) ?? `Unit#${action.unitId}`;
       return `${name} の移動を取消`;
     }
+    case "LOAD_STATE":
+      return "";
   }
 };
 
