@@ -123,15 +123,25 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
         break;
       }
       case "ANIMATION_COMPLETE": {
-        if (pendingGameAction.current) {
-          const action = pendingGameAction.current;
-          gameDispatch(action);
+        const completedAction = pendingGameAction.current;
+        if (completedAction) {
+          gameDispatch(completedAction);
           pendingGameAction.current = null;
-          if (action.type === "TURN_END") {
+          if (completedAction.type === "TURN_END") {
             uiDispatch({ type: "RESET" });
           }
         }
         uiDispatch({ type: "ANIMATION_COMPLETE" });
+        // Re-open menu if unit still has actions available
+        if (completedAction && (completedAction.type === "DO_MOVE" || completedAction.type === "DO_ATTACK")) {
+          const unit = loadUnit(completedAction.unitId, gameState.units);
+          const willBeExhausted = completedAction.type === "DO_MOVE"
+            ? unit.status.attacked  // After move: exhausted if already attacked
+            : unit.status.moved;    // After attack: exhausted if already moved
+          if (!willBeExhausted) {
+            uiDispatch({ type: "OPEN_MENU", unitId: completedAction.unitId });
+          }
+        }
         break;
       }
       case "TURN_END": {
@@ -171,10 +181,8 @@ const StageContent = () => {
           break;
         }
         case "Enter": {
-          if (uiState.isOpen) {
-            e.preventDefault();
-            dispatch({ type: "TURN_END" });
-          }
+          e.preventDefault();
+          dispatch({ type: "TURN_END" });
           break;
         }
         case "Tab": {
