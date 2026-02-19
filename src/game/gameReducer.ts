@@ -1,6 +1,7 @@
-import { UnitType, OrientationType, Player, PayloadMoveActionType, PayloadAttackActionType, TerrainType } from "../types";
+import { UnitType, Armament, OrientationType, Player, PayloadMoveActionType, PayloadAttackActionType, TerrainType } from "../types";
 import { tutorialScenario } from "../scenarios/tutorial";
 import { GameState, GameAction } from "./types";
+import { manhattanDistance } from "./utils";
 
 // --- Terrain helpers ---
 
@@ -11,6 +12,53 @@ export const getTerrainDefenseReduction = (terrain: TerrainType): number => {
     case "mountain": return 0.4;
     case "water": return 0;
   }
+};
+
+// --- Damage Calculation (unified) ---
+
+const MAX_DEFENSE_REDUCTION = 0.9;
+
+export const calculateDamage = (
+  attacker: UnitType,
+  defender: UnitType,
+  armament: Armament,
+  defenderTerrain: TerrainType,
+  allUnits: UnitType[],
+): { damage: number; modifiers: string[] } => {
+  const modifiers: string[] = [];
+  let attackMultiplier = 1;
+  let defenseReduction = getTerrainDefenseReduction(defenderTerrain);
+
+  // Fighter ability: "強襲" — +20% attack when moved
+  if (attacker.spec.unit_type === "fighter" && attacker.status.moved) {
+    attackMultiplier += 0.2;
+    modifiers.push("+20% 強襲");
+  }
+
+  // Tank ability: "装甲陣地" — +10% defense for defender if adjacent friendly tank exists
+  const hasAdjacentFriendlyTank = allUnits.some(
+    (u) =>
+      u.spec.id !== defender.spec.id &&
+      u.playerId === defender.playerId &&
+      u.spec.unit_type === "tank" &&
+      manhattanDistance(u.status.coordinate, defender.status.coordinate) === 1,
+  );
+  if (hasAdjacentFriendlyTank) {
+    defenseReduction += 0.1;
+    modifiers.push("+10% 装甲陣地");
+  }
+
+  // Soldier ability: "迷彩" — +20% defense in forest terrain
+  if (defender.spec.unit_type === "soldier" && defenderTerrain === "forest") {
+    defenseReduction += 0.2;
+    modifiers.push("+20% 迷彩");
+  }
+
+  // Cap defense at MAX_DEFENSE_REDUCTION
+  defenseReduction = Math.min(defenseReduction, MAX_DEFENSE_REDUCTION);
+
+  const damage = Math.floor(armament.value * attackMultiplier * (1 - defenseReduction));
+  return { damage, modifiers };
 };
 
 // --- Type Guards ---
@@ -116,8 +164,7 @@ const updateUnitsByAttack = (
 
   const attacked = loadUnit(payloadAction.target_unit_id, oldUnits);
   const targetTerrain = tutorialScenario.terrain[attacked.status.coordinate.y][attacked.status.coordinate.x];
-  const defenseReduction = getTerrainDefenseReduction(targetTerrain);
-  const actualDamage = Math.floor(armament.value * (1 - defenseReduction));
+  const { damage: actualDamage } = calculateDamage(unitInAction, attacked, armament, targetTerrain, oldUnits);
   const remainHp = attacked.status.hp - actualDamage;
 
   const newUnits =

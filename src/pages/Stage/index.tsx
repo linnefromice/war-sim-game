@@ -5,14 +5,16 @@ import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState, GameAction } from "../../game/types";
-import { gameReducer, getTerrainDefenseReduction, loadUnit, nextPlayer } from "../../game/gameReducer";
+import { gameReducer, calculateDamage, loadUnit, nextPlayer } from "../../game/gameReducer";
 import { ActionButtons } from "./ActionButtons";
 import { UnitDetailPanel } from "./UnitDetailPanel";
 import { TurnBanner } from "./TurnBanner";
 import { AnimationLayer } from "./AnimationLayer";
 import { GameOverOverlay } from "./GameOverOverlay";
-import { AIAction, computeAIActions } from "../../game/ai";
+import { AIDifficulty, AIAction, computeAIActions } from "../../game/ai";
 import { ScenarioProvider } from "../../contexts/ScenarioContext";
+import { UnitStatusSummary } from "./UnitStatusSummary";
+import { BattleLog } from "./BattleLog";
 
 const AI_PLAYER_ID = 2;
 
@@ -36,6 +38,7 @@ export const ActionContext = createContext<{
   gameState: GameState;
   uiState: StateActionMenuType;
   dispatch: (action: { type: ActionType; payload?: PayloadType }) => void;
+  difficulty?: AIDifficulty;
   onRestart?: () => void;
 }>({
   gameState: initialGameState,
@@ -44,7 +47,7 @@ export const ActionContext = createContext<{
   dispatch: (_: { type: ActionType; payload?: PayloadType }) => {},
 });
 
-export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
+export const Stage = ({ difficulty, onRestart }: { difficulty?: AIDifficulty; onRestart?: () => void }) => {
   const [gameState, gameDispatch] = useReducer(gameReducer, initialGameState);
   const [uiState, uiDispatch] = useReducer(uiReducer, INITIAL_ACTION_MENU);
   const pendingGameAction = useRef<GameAction | null>(null);
@@ -59,7 +62,10 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
       case "OPEN_MENU": {
         if (payload?.running_unit_id === undefined) return;
         const unit = loadUnit(payload.running_unit_id, gameState.units);
-        if (unit.playerId !== gameState.activePlayerId) return;
+        if (unit.playerId !== gameState.activePlayerId) {
+          uiDispatch({ type: "INSPECT_UNIT", unitId: payload.running_unit_id });
+          return;
+        }
         uiDispatch({ type: "OPEN_MENU", unitId: payload.running_unit_id });
         break;
       }
@@ -105,8 +111,7 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
         const target = loadUnit(payload.action.target_unit_id, gameState.units);
         const armament = unit.spec.armaments[payload.action.armament_idx];
         const targetTerrain = tutorialScenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
-        const defenseReduction = getTerrainDefenseReduction(targetTerrain);
-        const damage = Math.floor(armament.value * (1 - defenseReduction));
+        const { damage } = calculateDamage(unit, target, armament, targetTerrain, gameState.units);
         const destroyed = target.status.hp - damage <= 0;
         uiDispatch({ type: "ANIMATION_START_ATTACK", targetId: payload.action.target_unit_id, damage, destroyed });
         pendingGameAction.current = {
@@ -155,7 +160,7 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
 
   return (
     <ScenarioProvider scenario={tutorialScenario}>
-      <ActionContext.Provider value={{ gameState, uiState, dispatch, onRestart }}>
+      <ActionContext.Provider value={{ gameState, uiState, dispatch, difficulty, onRestart }}>
         <StageContent />
       </ActionContext.Provider>
     </ScenarioProvider>
@@ -163,7 +168,7 @@ export const Stage = ({ onRestart }: { onRestart?: () => void }) => {
 };
 
 const StageContent = () => {
-  const { dispatch, gameState, uiState } = useContext(ActionContext);
+  const { dispatch, gameState, uiState, difficulty } = useContext(ActionContext);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -225,7 +230,7 @@ const StageContent = () => {
 
     // Compute AI actions if queue is empty
     if (aiActionsRef.current.length === 0) {
-      aiActionsRef.current = computeAIActions(gameState.units, AI_PLAYER_ID);
+      aiActionsRef.current = computeAIActions(gameState.units, AI_PLAYER_ID, difficulty ?? "easy");
     }
 
     // Dispatch next action from queue
@@ -259,7 +264,7 @@ const StageContent = () => {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [gameState.activePlayerId, gameState.units, gameState.phase.type, uiState.animationState.type, dispatch]);
+  }, [gameState.activePlayerId, gameState.units, gameState.phase.type, uiState.animationState.type, dispatch, difficulty]);
 
   const unitsCoordinates = useMemo(() => {
     // Hide moving unit from grid during move animation (AnimationLayer renders it)
@@ -281,6 +286,7 @@ const StageContent = () => {
   return (
     <>
       <TurnBanner />
+      <UnitStatusSummary />
       <div className="play-area">
         <div className="stage">
           {Array.from({ length: tutorialScenario.gridSize.rows }).map((_, y) => (
@@ -296,6 +302,7 @@ const StageContent = () => {
         {uiState.isOpen && <ActionButtons />}
         <UnitDetailPanel />
       </div>
+      <BattleLog />
       {gameState.phase.type === "finished" && (
         <GameOverOverlay winnerId={gameState.phase.winner} />
       )}
