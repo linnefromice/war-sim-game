@@ -4,10 +4,10 @@ import { loadUnit } from "../../game/gameReducer";
 import { CellWithUnit } from "./CellWithUnit";
 import { TerrainTooltip } from "./TerrainTooltip";
 import { isWithinMoveRange } from "./cellUtils";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
+import { TerrainType } from "../../types";
 
-const getTerrainClass = (x: number, y: number): string => {
-  const terrain = tutorialScenario.terrain[y][x];
+const getTerrainClass = (terrain: TerrainType): string => {
   switch (terrain) {
     case "forest": return " cell-terrain-forest";
     case "mountain": return " cell-terrain-mountain";
@@ -18,6 +18,7 @@ const getTerrainClass = (x: number, y: number): string => {
 
 export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: number, y: number, unitId?: number, targetUnitId: number }) => {
   const { gameState: { units }, dispatch } = useContext(ActionContext);
+  const scenario = useScenario();
   const [hovered, setHovered] = useState(false);
   const targetUnit = loadUnit(targetUnitId, units);
   const { spec, status } = targetUnit;
@@ -58,7 +59,7 @@ export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: num
 
   return (
     <div
-      className={`cell${getTerrainClass(x, y)}`}
+      className={`cell${getTerrainClass(scenario.terrain[y][x])}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

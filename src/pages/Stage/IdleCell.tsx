@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { ActionContext } from ".";
 import { CellWithUnit } from "./CellWithUnit";
 import { TerrainTooltip } from "./TerrainTooltip";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
+import { TerrainType } from "../../types";
 
-const getTerrainClass = (x: number, y: number): string => {
-  const terrain = tutorialScenario.terrain[y][x];
+const getTerrainClass = (terrain: TerrainType): string => {
   switch (terrain) {
     case "forest": return " cell-terrain-forest";
     case "mountain": return " cell-terrain-mountain";
@@ -16,6 +16,7 @@ const getTerrainClass = (x: number, y: number): string => {
 
 export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, unitId?: number }) => {
   const { dispatch } = useContext(ActionContext);
+  const scenario = useScenario();
   const [hovered, setHovered] = useState(false);
 
   if (unitId) {
@@ -30,7 +31,7 @@ export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, un
 
   return (
     <div
-      className={`cell${getTerrainClass(x, y)}`}
+      className={`cell${getTerrainClass(scenario.terrain[y][x])}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

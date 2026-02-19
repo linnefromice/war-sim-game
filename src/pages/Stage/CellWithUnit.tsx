@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { ActionContext } from ".";
 import { calculateOrientation, getPlayer, loadUnit } from "../../game/gameReducer";
 import { UnitIcon } from "./UnitIcon";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 
 const hpBarClass = (current: number, max: number): string => {
   const ratio = current / max;
@@ -13,8 +13,9 @@ const hpBarClass = (current: number, max: number): string => {
 
 export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, onClick: () => void }) => {
   const { gameState: { units }, uiState: actionMenu } = useContext(ActionContext);
+  const scenario = useScenario();
   const { spec, status, playerId } = loadUnit(unitId, units);
-  const { rgb } = getPlayer(playerId, tutorialScenario.players);
+  const { rgb } = getPlayer(playerId, scenario.players);
 
   const orientation = calculateOrientation(
     status.coordinate,

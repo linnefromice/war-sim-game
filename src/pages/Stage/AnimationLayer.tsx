@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { ActionContext } from ".";
 import { getPlayer, loadUnit } from "../../game/gameReducer";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 import { UnitIcon } from "./UnitIcon";
 import { Coordinate, UnitCategory } from "../../types";
 import { CELL_SIZE, CELL_BORDER, CELL_INTERVAL, GRID_OFFSET } from "./layoutConstants";
@@ -77,7 +77,8 @@ const AttackAnimation = ({ coord, damage }: { coord: Coordinate; damage: number 
 };
 
 const TurnChangeAnimation = ({ nextPlayerId }: { nextPlayerId: number }) => {
-  const player = getPlayer(nextPlayerId, tutorialScenario.players);
+  const scenario = useScenario();
+  const player = getPlayer(nextPlayerId, scenario.players);
   return (
     <div className="turn-change-overlay">
       <div className="turn-change-banner" style={{

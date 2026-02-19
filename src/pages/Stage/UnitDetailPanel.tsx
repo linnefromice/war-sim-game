@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
-import { tutorialScenario } from "../../scenarios/tutorial";
+import { useScenario } from "../../contexts/ScenarioContext";
 import { UnitIcon } from "./UnitIcon";
 
 export const UnitDetailPanel = () => {
@@ -9,6 +9,7 @@ export const UnitDetailPanel = () => {
     gameState: { units },
     uiState,
   } = useContext(ActionContext);
+  const scenario = useScenario();
 
   const targetUnitId = uiState.targetUnitId;
 
@@ -23,7 +24,7 @@ export const UnitDetailPanel = () => {
   }
 
   const { spec, status, playerId } = loadUnit(targetUnitId, units);
-  const player = tutorialScenario.players.find(p => p.id === playerId);
+  const player = scenario.players.find(p => p.id === playerId);
   const playerColor = player
     ? `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})`
     : "white";
