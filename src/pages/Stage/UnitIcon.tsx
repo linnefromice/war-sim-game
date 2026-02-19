@@ -1,26 +1,33 @@
-import FighterJetIcon from "../../assets/fighterJet.svg?react";
-import ArmyTankIcon from "../../assets/armyTank.svg?react";
-import BattleSoldierIcon from "../../assets/battleSoldier.svg?react";
+import fighterImg from "../../assets/fighter.jpg";
+import tankImg from "../../assets/tank.jpg";
+import soldierImg from "../../assets/army.jpg";
 import { UnitCategory } from "../../types";
 
 function assertNever(x: never): never {
   throw new Error(`Unexpected value: ${x}`);
 }
 
-export const UnitIcon = ({ unitType, className }: { unitType: UnitCategory, className: string }): JSX.Element => {
-  const props = {
-    width: 28,
-    height: 28,
-    className,
-  }
+const unitImageMap: Record<UnitCategory, string> = {
+  fighter: fighterImg,
+  tank: tankImg,
+  soldier: soldierImg,
+};
 
+export const UnitIcon = ({ unitType, className }: { unitType: UnitCategory, className: string }): JSX.Element => {
   switch (unitType) {
     case "fighter":
-      return <FighterJetIcon {...props} />
     case "tank":
-      return <ArmyTankIcon {...props} />
     case "soldier":
-      return <BattleSoldierIcon {...props}/>
+      return (
+        <img
+          src={unitImageMap[unitType]}
+          alt={unitType}
+          width={28}
+          height={28}
+          className={className}
+          style={{ objectFit: "contain", borderRadius: 4 }}
+        />
+      );
     default:
       return assertNever(unitType);
   }
