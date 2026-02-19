@@ -65,6 +65,7 @@
   }
 
   &-end-turn-btn {
+    margin-left: 8px;
     padding: 6px 16px;
     background-color: rgba(245, 158, 11, 0.15);
     border: 1px solid rgba(245, 158, 11, 0.4);
@@ -357,20 +358,6 @@
     }
   }
 
-  // Position toggle - ghost with cyan accent
-  &-position {
-    background-color: transparent;
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    color: var(--color-text-muted);
-    font-size: 12px;
-
-    &:hover:not(:disabled) {
-      background-color: rgba(0, 212, 255, 0.08);
-      border-color: rgba(0, 212, 255, 0.4);
-      color: var(--color-accent-cyan);
-    }
-  }
-
   // Close button - ghost
   &-close {
     background-color: transparent;
@@ -399,6 +386,38 @@
   border-top: 1px solid rgba(0, 212, 255, 0.15);
   margin: 6px 0;
   width: 100%;
+}
+
+// Position selector (2x2 grid)
+.action-menu-position-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+
+.action-menu-position-btn {
+  padding: 4px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    background-color: rgba(0, 212, 255, 0.08);
+    border-color: rgba(0, 212, 255, 0.3);
+    color: var(--color-accent-cyan);
+  }
+
+  &--active {
+    background-color: rgba(0, 212, 255, 0.15);
+    border-color: rgba(0, 212, 255, 0.5);
+    color: var(--color-accent-cyan);
+  }
 }
 
 // ============================================================
