@@ -4,14 +4,7 @@ import { getPlayer, loadUnit } from "../../game/gameReducer";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { UnitIcon } from "./UnitIcon";
 import { Coordinate, UnitCategory } from "../../types";
-
-// Cell layout constants (must match Stage.scss)
-const CELL_SIZE = 64;
-const CELL_BORDER = 1;
-const CELL_MARGIN = 1;
-const STAGE_MARGIN = 4;
-const CELL_INTERVAL = CELL_SIZE + 2 * CELL_BORDER + 2 * CELL_MARGIN; // 68px
-const GRID_OFFSET = STAGE_MARGIN + CELL_MARGIN; // 5px
+import { CELL_SIZE, CELL_BORDER, CELL_INTERVAL, GRID_OFFSET } from "./layoutConstants";
 
 export const MOVE_DURATION = 300;
 export const ATTACK_DURATION = 600;

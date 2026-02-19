@@ -2,16 +2,9 @@ import { useContext, useMemo, useState } from "react";
 import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
 import { tutorialScenario } from "../../scenarios/tutorial";
+import { CELL_INTERVAL, GRID_OFFSET, STAGE_PADDING } from "./layoutConstants";
 
-// Layout constants matching cell grid
-const CELL_SIZE = 64;
-const CELL_BORDER = 1;
-const CELL_MARGIN = 1;
-const STAGE_MARGIN = 4;
-const CELL_INTERVAL = CELL_SIZE + (CELL_BORDER + CELL_MARGIN) * 2; // 68
-const GRID_OFFSET = STAGE_MARGIN + 1; // stage margin + small offset for padding
-
-export const ActionMenu = () => {
+export const ActionButtons = () => {
   const {
     gameState: { units },
     uiState: actionMenu,
@@ -21,8 +14,6 @@ export const ActionMenu = () => {
 
   const targetUnitId = actionMenu.targetUnitId;
 
-  // Calculate context position near the selected unit
-  // Hook must be called before any early return to satisfy Rules of Hooks
   const menuPosition = useMemo(() => {
     if (!targetUnitId) return { top: 0, left: 0, transform: "none" };
 
@@ -31,34 +22,25 @@ export const ActionMenu = () => {
     const gridCols = tutorialScenario.gridSize.cols;
     const gridRows = tutorialScenario.gridSize.rows;
 
-    // Account for stage padding (12px from .stage padding in SCSS)
-    const stagePadding = 12;
-
-    const showOnLeft = coord.x >= Math.ceil(gridCols / 2); // >= 7 out of 13
-    const showAbove = coord.y >= Math.ceil(gridRows / 2); // >= 5 out of 10
+    const showOnLeft = coord.x >= Math.ceil(gridCols / 2);
+    const showAbove = coord.y >= Math.ceil(gridRows / 2);
 
     const transformParts: string[] = [];
 
-    // Vertical positioning
     let top: number;
     if (showAbove) {
-      // Align bottom of menu with bottom of cell
-      top = GRID_OFFSET + stagePadding + (coord.y + 1) * CELL_INTERVAL;
+      top = GRID_OFFSET + STAGE_PADDING + (coord.y + 1) * CELL_INTERVAL;
       transformParts.push("translateY(-100%)");
     } else {
-      // Align top of menu with top of cell (default)
-      top = GRID_OFFSET + stagePadding + coord.y * CELL_INTERVAL;
+      top = GRID_OFFSET + STAGE_PADDING + coord.y * CELL_INTERVAL;
     }
 
-    // Horizontal positioning
     let left: number;
     if (showOnLeft) {
-      // Show to the LEFT of the unit cell
-      left = GRID_OFFSET + stagePadding + coord.x * CELL_INTERVAL - 8; // 8px gap
+      left = GRID_OFFSET + STAGE_PADDING + coord.x * CELL_INTERVAL - 8;
       transformParts.push("translateX(-100%)");
     } else {
-      // Show to the RIGHT of the unit cell
-      left = GRID_OFFSET + stagePadding + coord.x * CELL_INTERVAL + CELL_INTERVAL + 8; // 8px gap
+      left = GRID_OFFSET + STAGE_PADDING + coord.x * CELL_INTERVAL + CELL_INTERVAL + 8;
     }
 
     return {
@@ -70,68 +52,17 @@ export const ActionMenu = () => {
 
   if (!targetUnitId) return <></>;
 
-  const { spec, status, playerId } = loadUnit(targetUnitId, units);
-
-  const hpPercent = (status.hp / spec.max_hp) * 100;
-  const enPercent = (status.en / spec.max_en) * 100;
-
-  const player = tutorialScenario.players.find((p) => p.id === playerId);
-  const playerColor = player
-    ? `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})`
-    : "white";
+  const { spec, status } = loadUnit(targetUnitId, units);
 
   return (
     <div
-      className="action-menu"
+      className="action-buttons"
       style={{
         top: menuPosition.top,
         left: menuPosition.left,
         transform: menuPosition.transform,
       }}
     >
-      {/* Unit summary header */}
-      <div className="action-menu-header">
-        <div className="action-menu-header-name" style={{ color: playerColor }}>
-          {spec.name}
-        </div>
-        <div className="action-menu-header-bars">
-          <div className="action-menu-header-stat">
-            <span
-              className="action-menu-header-stat-label"
-              style={{ color: "#4ade80" }}
-            >
-              HP
-            </span>
-            <div className="action-menu-header-stat-bar">
-              <div
-                className="action-menu-header-stat-bar-fill action-menu-header-stat-bar-fill--hp"
-                style={{ width: `${hpPercent}%` }}
-              />
-            </div>
-            <span className="action-menu-header-stat-value">
-              {status.hp}/{spec.max_hp}
-            </span>
-          </div>
-          <div className="action-menu-header-stat">
-            <span
-              className="action-menu-header-stat-label"
-              style={{ color: "#60a5fa" }}
-            >
-              EN
-            </span>
-            <div className="action-menu-header-stat-bar">
-              <div
-                className="action-menu-header-stat-bar-fill action-menu-header-stat-bar-fill--en"
-                style={{ width: `${enPercent}%` }}
-              />
-            </div>
-            <span className="action-menu-header-stat-value">
-              {status.en}/{spec.max_en}
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Move button */}
       <button
         className={

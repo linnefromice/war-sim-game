@@ -122,7 +122,11 @@ describe("Stage win detection", () => {
     await user.click(screen.getByText("攻撃"));
 
     // Select Missile (400 dmg, range 3) — enemy at distance 1, well within range
-    await user.click(screen.getByText("Missile"));
+    // Use action-buttons scoped query since UnitDetailPanel also shows armament names
+    const actionBtns = container.querySelector(".action-buttons")!;
+    const missileItem = Array.from(actionBtns.querySelectorAll(".action-sub-menu-item-name"))
+      .find(el => el.textContent === "Missile")!;
+    await user.click(missileItem.closest(".action-sub-menu-item")!);
 
     // Attack range should be shown
     const attackRangeCells = container.querySelectorAll(".cell-attack-range");
@@ -155,7 +159,7 @@ describe("Stage win detection", () => {
 
     // Victory screen should show
     expect(screen.getByText("Player 1 Wins!")).toBeInTheDocument();
-    expect(screen.getByText("Hero")).toBeInTheDocument();
+    expect(screen.getAllByText("Hero").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Restart")).toBeInTheDocument();
   });
 });

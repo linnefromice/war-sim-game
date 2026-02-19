@@ -188,15 +188,16 @@ describe("Stage component tests (full scenario)", () => {
       await user.click(attackBtn);
 
       // Weapon sub-menu should appear with POW/EN/RANGE info
-      expect(screen.getByText("Machine gun")).toBeInTheDocument();
-      expect(screen.getByText("Missile")).toBeInTheDocument();
+      const actionButtons = container.querySelector(".action-buttons")!;
+      expect(actionButtons.querySelector(".action-sub-menu")).toBeTruthy();
 
       // Look for weapon description
       const descriptions = container.querySelectorAll(".action-sub-menu-description");
       expect(descriptions.length).toBeGreaterThan(0);
 
-      // Select Machine gun
-      await user.click(screen.getByText("Machine gun"));
+      // Select Machine gun (from the action sub-menu specifically)
+      const machineGunItem = actionButtons.querySelector(".action-sub-menu-item")!;
+      await user.click(machineGunItem);
 
       // Attack range cells should appear
       const attackRangeCells = container.querySelectorAll(".cell-attack-range");
@@ -209,8 +210,8 @@ describe("Stage component tests (full scenario)", () => {
       for (const uc of allUnitCells) {
         // Try clicking unit cells - if one is in range, the attack will execute
         await user.click(uc);
-        // If menu closed, attack animation started
-        if (!screen.queryByText("Machine gun")) {
+        // If action sub-menu closed, attack animation started
+        if (!container.querySelector(".action-sub-menu")) {
           // Complete attack animation
           await act(() => {
             vi.advanceTimersByTime(ATTACK_DURATION);
@@ -230,9 +231,9 @@ describe("Stage component tests (full scenario)", () => {
     const { render: rtlRender } = await import("@testing-library/react");
     const { container } = rtlRender(<Stage />);
 
-    // Initially Player 1 is active
-    expect(screen.getByText(/▶ Hero/)).toBeInTheDocument();
-    expect(screen.getByText("のターン")).toBeInTheDocument();
+    // Initially Player 1 is active (check center turn indicator)
+    const centerName = container.querySelector(".turn-banner-center-name")!;
+    expect(centerName.textContent).toBe("Hero");
 
     const stage = getStage(container);
     const rows = stage.querySelectorAll(".row");
@@ -250,8 +251,8 @@ describe("Stage component tests (full scenario)", () => {
       vi.advanceTimersByTime(TURN_CHANGE_DURATION);
     });
 
-    // Player should switch to Player 2
-    expect(screen.getByText(/▶ Villan/)).toBeInTheDocument();
-    expect(screen.getByText("のターン")).toBeInTheDocument();
+    // Player should switch to Player 2 (check center turn indicator)
+    const updatedCenterName = container.querySelector(".turn-banner-center-name")!;
+    expect(updatedCenterName.textContent).toBe("Villan");
   });
 });
