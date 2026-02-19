@@ -7,6 +7,7 @@ export const INITIAL_ACTION_MENU: StateActionMenuType = {
   selectedArmamentIdx: null,
   animationState: { type: "idle" },
   inspectedUnitId: null,
+  cursorPosition: null,
 };
 
 export type UIAction =
@@ -20,6 +21,8 @@ export type UIAction =
   | { type: "ANIMATION_START_ATTACK"; targetId: number; damage: number; destroyed: boolean }
   | { type: "ANIMATION_START_TURN_CHANGE"; nextPlayerId: number }
   | { type: "ANIMATION_COMPLETE" }
+  | { type: "MOVE_CURSOR"; position: Coordinate }
+  | { type: "CLEAR_CURSOR" }
 
 const nextActionOption = (type: UIAction["type"]): ActionOptionType | null => {
   if (type === "SELECT_MOVE") return "MOVE";
@@ -93,6 +96,16 @@ export const uiReducer = (
       return {
         ...state,
         animationState: { type: "idle" },
+      };
+    case "MOVE_CURSOR":
+      return {
+        ...state,
+        cursorPosition: action.position,
+      };
+    case "CLEAR_CURSOR":
+      return {
+        ...state,
+        cursorPosition: null,
       };
     default:
       return state;

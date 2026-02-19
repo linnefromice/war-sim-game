@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from "react";
 import "./Stage.scss"
 import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
-import { INITIAL_ACTION_MENU, uiReducer } from "./logics";
+import { INITIAL_ACTION_MENU, uiReducer, UIAction } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
 import { GameState, GameAction } from "../../game/types";
@@ -38,6 +38,7 @@ export const ActionContext = createContext<{
   gameState: GameState;
   uiState: StateActionMenuType;
   dispatch: (action: { type: ActionType; payload?: PayloadType }) => void;
+  uiDispatch: (action: UIAction) => void;
   difficulty?: AIDifficulty;
   onRestart?: () => void;
 }>({
@@ -45,10 +46,12 @@ export const ActionContext = createContext<{
   uiState: INITIAL_ACTION_MENU,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dispatch: (_: { type: ActionType; payload?: PayloadType }) => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  uiDispatch: (_: UIAction) => {},
 });
 
-export const Stage = ({ difficulty, onRestart }: { difficulty?: AIDifficulty; onRestart?: () => void }) => {
-  const [gameState, gameDispatch] = useReducer(gameReducer, initialGameState);
+export const Stage = ({ difficulty, onRestart, loadedState }: { difficulty?: AIDifficulty; onRestart?: () => void; loadedState?: GameState | null }) => {
+  const [gameState, gameDispatch] = useReducer(gameReducer, loadedState ?? initialGameState);
   const [uiState, uiDispatch] = useReducer(uiReducer, INITIAL_ACTION_MENU);
   const pendingGameAction = useRef<GameAction | null>(null);
 
@@ -160,7 +163,7 @@ export const Stage = ({ difficulty, onRestart }: { difficulty?: AIDifficulty; on
 
   return (
     <ScenarioProvider scenario={tutorialScenario}>
-      <ActionContext.Provider value={{ gameState, uiState, dispatch, difficulty, onRestart }}>
+      <ActionContext.Provider value={{ gameState, uiState, dispatch, uiDispatch, difficulty, onRestart }}>
         <StageContent />
       </ActionContext.Provider>
     </ScenarioProvider>
@@ -168,7 +171,24 @@ export const Stage = ({ difficulty, onRestart }: { difficulty?: AIDifficulty; on
 };
 
 const StageContent = () => {
-  const { dispatch, gameState, uiState, difficulty } = useContext(ActionContext);
+  const { dispatch, uiDispatch, gameState, uiState, difficulty } = useContext(ActionContext);
+
+  const unitsCoordinates = useMemo(() => {
+    // Hide moving unit from grid during move animation (AnimationLayer renders it)
+    const animatingUnitId = uiState.animationState.type === "move" ? uiState.animationState.unitId : null;
+    return gameState.units.reduce((map, unit) => {
+      if (unit.spec.id === animatingUnitId) return map;
+      const { x, y } = unit.status.coordinate;
+      const mapKey = `x${x}y${y}`;
+      if (map.has(mapKey)) {
+        throw new Error(
+          `Duplicate coordinates: ${x},${y} oldUnit=${map.get(mapKey)} newUnit=${unit.spec.id}`
+        );
+      }
+      map.set(mapKey, unit.spec.id);
+      return map;
+    }, new Map<string, number>());
+  }, [gameState.units, uiState.animationState]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -179,15 +199,50 @@ const StageContent = () => {
 
       switch (e.key) {
         case "Escape": {
+          e.preventDefault();
           if (uiState.isOpen) {
-            e.preventDefault();
             dispatch({ type: "CLOSE_MENU" });
           }
+          uiDispatch({ type: "CLEAR_CURSOR" });
           break;
         }
         case "Enter": {
-          e.preventDefault();
-          dispatch({ type: "TURN_END" });
+          // If cursor is active, act as cell click
+          if (uiState.cursorPosition) {
+            e.preventDefault();
+            const { x, y } = uiState.cursorPosition;
+            const unitId = unitsCoordinates.get(`x${x}y${y}`);
+
+            if (uiState.activeActionOption === "MOVE") {
+              if (uiState.targetUnitId) {
+                dispatch({
+                  type: "DO_MOVE",
+                  payload: {
+                    running_unit_id: uiState.targetUnitId,
+                    action: { x, y },
+                  },
+                });
+              }
+            } else if (uiState.activeActionOption === "ATTACK") {
+              if (uiState.targetUnitId && unitId) {
+                dispatch({
+                  type: "DO_ATTACK",
+                  payload: {
+                    running_unit_id: uiState.targetUnitId,
+                    action: {
+                      target_unit_id: unitId,
+                      armament_idx: uiState.selectedArmamentIdx ?? 0,
+                    },
+                  },
+                });
+              }
+            } else if (unitId) {
+              dispatch({ type: "OPEN_MENU", payload: { running_unit_id: unitId } });
+            }
+          } else {
+            e.preventDefault();
+            dispatch({ type: "TURN_END" });
+          }
           break;
         }
         case "Tab": {
@@ -207,6 +262,22 @@ const StageContent = () => {
           const nextUnit = playerUnits[nextIdx];
 
           dispatch({ type: "OPEN_MENU", payload: { running_unit_id: nextUnit.spec.id } });
+          uiDispatch({ type: "MOVE_CURSOR", position: nextUnit.status.coordinate });
+          break;
+        }
+        case "ArrowUp":
+        case "ArrowDown":
+        case "ArrowLeft":
+        case "ArrowRight": {
+          e.preventDefault();
+          const cur = uiState.cursorPosition ?? { x: 0, y: 0 };
+          let nx = cur.x;
+          let ny = cur.y;
+          if (e.key === "ArrowUp") ny = Math.max(0, cur.y - 1);
+          if (e.key === "ArrowDown") ny = Math.min(tutorialScenario.gridSize.rows - 1, cur.y + 1);
+          if (e.key === "ArrowLeft") nx = Math.max(0, cur.x - 1);
+          if (e.key === "ArrowRight") nx = Math.min(tutorialScenario.gridSize.cols - 1, cur.x + 1);
+          uiDispatch({ type: "MOVE_CURSOR", position: { x: nx, y: ny } });
           break;
         }
       }
@@ -214,7 +285,7 @@ const StageContent = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dispatch, gameState.units, gameState.activePlayerId, uiState.isOpen, uiState.targetUnitId, uiState.animationState.type]);
+  }, [dispatch, uiDispatch, gameState.units, gameState.activePlayerId, uiState.isOpen, uiState.targetUnitId, uiState.animationState.type, uiState.cursorPosition, uiState.activeActionOption, uiState.selectedArmamentIdx, unitsCoordinates]);
 
   // --- AI Opponent ---
   const aiActionsRef = useRef<AIAction[]>([]);
@@ -265,23 +336,6 @@ const StageContent = () => {
       return () => clearTimeout(timer);
     }
   }, [gameState.activePlayerId, gameState.units, gameState.phase.type, uiState.animationState.type, dispatch, difficulty]);
-
-  const unitsCoordinates = useMemo(() => {
-    // Hide moving unit from grid during move animation (AnimationLayer renders it)
-    const animatingUnitId = uiState.animationState.type === "move" ? uiState.animationState.unitId : null;
-    return gameState.units.reduce((map, unit) => {
-      if (unit.spec.id === animatingUnitId) return map;
-      const { x, y } = unit.status.coordinate;
-      const mapKey = `x${x}y${y}`;
-      if (map.has(mapKey)) {
-        throw new Error(
-          `Duplicate coordinates: ${x},${y} oldUnit=${map.get(mapKey)} newUnit=${unit.spec.id}`
-        );
-      }
-      map.set(mapKey, unit.spec.id);
-      return map;
-    }, new Map<string, number>());
-  }, [gameState.units, uiState.animationState]);
 
   return (
     <>

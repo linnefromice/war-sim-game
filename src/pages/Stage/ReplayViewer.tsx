@@ -23,6 +23,8 @@ const formatAction = (action: GameAction, units: UnitType[]): string => {
       const unit = loadUnit(action.unitId, units);
       return `${unit.spec.name} の移動を取消`;
     }
+    case "LOAD_STATE":
+      return "";
   }
 };
 

@@ -17,3 +17,4 @@ export type GameAction =
   | { type: "DO_ATTACK"; unitId: number; payload: PayloadAttackActionType }
   | { type: "TURN_END" }
   | { type: "UNDO_MOVE"; unitId: number }
+  | { type: "LOAD_STATE"; state: GameState }

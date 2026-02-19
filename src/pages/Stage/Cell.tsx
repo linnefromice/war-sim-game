@@ -6,23 +6,29 @@ import { IdleCell } from "./IdleCell";
 
 export const Cell = React.memo(({ x, y, unitId }: { x: number, y: number, unitId?: number }) => {
   const { uiState: actionMenu } = useContext(ActionContext);
+  const isCursor = actionMenu.cursorPosition?.x === x && actionMenu.cursorPosition?.y === y;
+
+  const wrapWithCursor = (cell: React.ReactElement) => {
+    if (!isCursor) return cell;
+    return <div className="cell-cursor-wrapper">{cell}</div>;
+  };
 
   if (actionMenu.targetUnitId) {
     const targetUnitId = actionMenu.targetUnitId;
     if (targetUnitId === unitId) {
-      return <IdleCell x={x} y={y} unitId={unitId} />;
+      return wrapWithCursor(<IdleCell x={x} y={y} unitId={unitId} />);
     }
 
     if (actionMenu.activeActionOption === "MOVE") {
-      return <MoveModeCell x={x} y={y} unitId={unitId} targetUnitId={targetUnitId} />;
+      return wrapWithCursor(<MoveModeCell x={x} y={y} unitId={unitId} targetUnitId={targetUnitId} />);
     }
     if (actionMenu.activeActionOption === "ATTACK") {
       const selectedArmamentIdx = actionMenu.selectedArmamentIdx ?? 0;
-      return <AttackModeCell x={x} y={y} unitId={unitId} targetUnitId={targetUnitId} selectedArmamentIdx={selectedArmamentIdx} />;
+      return wrapWithCursor(<AttackModeCell x={x} y={y} unitId={unitId} targetUnitId={targetUnitId} selectedArmamentIdx={selectedArmamentIdx} />);
     }
   }
 
-  return <IdleCell x={x} y={y} unitId={unitId} />;
+  return wrapWithCursor(<IdleCell x={x} y={y} unitId={unitId} />);
 });
 
 Cell.displayName = "Cell";
