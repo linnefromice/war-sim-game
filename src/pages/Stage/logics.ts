@@ -6,6 +6,7 @@ export const INITIAL_ACTION_MENU: StateActionMenuType = {
   activeActionOption: null,
   selectedArmamentIdx: null,
   animationState: { type: "idle" },
+  inspectedUnitId: null,
 };
 
 export type UIAction =
@@ -14,6 +15,7 @@ export type UIAction =
   | { type: "SELECT_MOVE" }
   | { type: "SELECT_ATTACK"; payload: PayloadAttackActionType }
   | { type: "RESET" }
+  | { type: "INSPECT_UNIT"; unitId: number }
   | { type: "ANIMATION_START_MOVE"; unitId: number; from: Coordinate; to: Coordinate }
   | { type: "ANIMATION_START_ATTACK"; targetId: number; damage: number; destroyed: boolean }
   | { type: "ANIMATION_START_TURN_CHANGE"; nextPlayerId: number }
@@ -42,12 +44,19 @@ export const uiReducer = (
         targetUnitId: action.unitId,
         activeActionOption: null,
         selectedArmamentIdx: null,
+        inspectedUnitId: null,
       };
     case "CLOSE_MENU":
     case "RESET":
       return {
         ...INITIAL_ACTION_MENU,
         activeActionOption: nextActionOption(action.type),
+        inspectedUnitId: null,
+      };
+    case "INSPECT_UNIT":
+      return {
+        ...INITIAL_ACTION_MENU,
+        inspectedUnitId: action.unitId,
       };
     case "SELECT_MOVE":
       return {

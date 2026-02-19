@@ -182,4 +182,50 @@ describe("uiReducer", () => {
       expect(result.animationState).toEqual({ type: "idle" });
     });
   });
+
+  // ── INSPECT_UNIT Tests (A2) ──
+
+  describe("INSPECT_UNIT", () => {
+    it("sets inspectedUnitId", () => {
+      const result = uiReducer(INITIAL_ACTION_MENU, {
+        type: "INSPECT_UNIT",
+        unitId: 5,
+      });
+      expect(result.inspectedUnitId).toBe(5);
+      expect(result.isOpen).toBe(false);
+      expect(result.targetUnitId).toBeNull();
+    });
+
+    it("clears inspectedUnitId when OPEN_MENU is dispatched", () => {
+      const inspectingState = withIdle({ inspectedUnitId: 5 });
+      const result = uiReducer(inspectingState, {
+        type: "OPEN_MENU",
+        unitId: 1,
+      });
+      expect(result.inspectedUnitId).toBeNull();
+      expect(result.targetUnitId).toBe(1);
+      expect(result.isOpen).toBe(true);
+    });
+
+    it("clears inspectedUnitId when CLOSE_MENU is dispatched", () => {
+      const inspectingState = withIdle({ inspectedUnitId: 5 });
+      const result = uiReducer(inspectingState, { type: "CLOSE_MENU" });
+      expect(result.inspectedUnitId).toBeNull();
+    });
+
+    it("clears inspectedUnitId when RESET is dispatched", () => {
+      const inspectingState = withIdle({ inspectedUnitId: 5 });
+      const result = uiReducer(inspectingState, { type: "RESET" });
+      expect(result.inspectedUnitId).toBeNull();
+    });
+
+    it("replaces previous inspectedUnitId when a different unit is inspected", () => {
+      const inspectingState = withIdle({ inspectedUnitId: 5 });
+      const result = uiReducer(inspectingState, {
+        type: "INSPECT_UNIT",
+        unitId: 7,
+      });
+      expect(result.inspectedUnitId).toBe(7);
+    });
+  });
 });

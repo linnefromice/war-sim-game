@@ -3,17 +3,18 @@ import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { UnitIcon } from "./UnitIcon";
+import { UNIT_ABILITIES } from "../../constants";
 
 export const UnitDetailPanel = () => {
   const {
-    gameState: { units },
+    gameState: { units, activePlayerId },
     uiState,
   } = useContext(ActionContext);
   const scenario = useScenario();
 
-  const targetUnitId = uiState.targetUnitId;
+  const displayUnitId = uiState.targetUnitId ?? uiState.inspectedUnitId;
 
-  if (!targetUnitId) {
+  if (!displayUnitId) {
     return (
       <div className="unit-detail-panel unit-detail-panel--empty">
         <div className="unit-detail-panel-placeholder">
@@ -23,7 +24,8 @@ export const UnitDetailPanel = () => {
     );
   }
 
-  const { spec, status, playerId } = loadUnit(targetUnitId, units);
+  const { spec, status, playerId } = loadUnit(displayUnitId, units);
+  const isEnemy = playerId !== activePlayerId;
   const player = scenario.players.find(p => p.id === playerId);
   const playerColor = player
     ? `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})`
@@ -42,6 +44,7 @@ export const UnitDetailPanel = () => {
       {/* Unit name */}
       <div className="unit-detail-panel-name" style={{ color: playerColor }}>
         {spec.name}
+        {isEnemy && <span className="unit-detail-panel-enemy-badge">(敵)</span>}
       </div>
 
       {/* HP bar */}
@@ -66,6 +69,15 @@ export const UnitDetailPanel = () => {
           />
         </div>
         <span className="unit-detail-panel-stat-value">{status.en}/{spec.max_en}</span>
+      </div>
+
+      {/* Ability */}
+      <div className="unit-detail-panel-ability">
+        <div className="unit-detail-panel-ability-title">ABILITY</div>
+        <div className="unit-detail-panel-ability-content">
+          <span className="unit-detail-panel-ability-name">{UNIT_ABILITIES[spec.unit_type].name}</span>
+          <span className="unit-detail-panel-ability-desc">{UNIT_ABILITIES[spec.unit_type].description}</span>
+        </div>
       </div>
 
       {/* Armament list (read-only) */}

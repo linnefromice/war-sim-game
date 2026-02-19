@@ -196,6 +196,64 @@ describe("computeAIActions", () => {
     expect(actions[actions.length - 1]).toEqual({ type: "turn_end" });
   });
 
+  // ── Difficulty-specific tests ──
+
+  describe("normal difficulty", () => {
+    it("prefers attacking wounded enemy over full-HP enemy", () => {
+      // Two enemies in range: one at full HP (1000), one wounded (200)
+      const units = [
+        makeUnit(1, AI_PLAYER_ID, { ...coord(5, 3) }),
+        makeUnit(2, 1, { ...coord(5, 4), hp: 1000 }),  // full HP
+        makeUnit(3, 1, { ...coord(5, 5), hp: 200 }),    // wounded
+      ];
+      const actions = computeAIActions(units, AI_PLAYER_ID, "normal");
+
+      const attackAction = actions.find(
+        (a): a is Extract<AIAction, { type: "attack" }> => a.type === "attack"
+      );
+      expect(attackAction).toBeDefined();
+      // Should prefer the wounded enemy (id=3) since damage scoring considers HP ratio
+      // Wounded at 200/1000 = 20% HP, gets higher priority than full HP
+      expect(attackAction!.payload.target_unit_id).toBe(3);
+    });
+
+    it("prioritizes killable target over wounded target", () => {
+      // Enemy with 100 HP (killable with Gun 200 damage) vs enemy with 300 HP (wounded but not killable)
+      const units = [
+        makeUnit(1, AI_PLAYER_ID, { ...coord(5, 3) }),
+        makeUnit(2, 1, { ...coord(5, 4), hp: 100 }),   // killable
+        makeUnit(3, 1, { ...coord(5, 5), hp: 300 }),    // wounded but not killable with best weapon in range
+      ];
+      const actions = computeAIActions(units, AI_PLAYER_ID, "normal");
+
+      const attackAction = actions.find(
+        (a): a is Extract<AIAction, { type: "attack" }> => a.type === "attack"
+      );
+      expect(attackAction).toBeDefined();
+      expect(attackAction!.payload.target_unit_id).toBe(2);
+    });
+  });
+
+  describe("hard difficulty", () => {
+    it("multiple AI units prefer attacking same target (focus fire)", () => {
+      // Two AI units, two enemies — hard should focus fire on one target
+      const units = [
+        makeUnit(1, AI_PLAYER_ID, { ...coord(5, 3) }),
+        makeUnit(2, AI_PLAYER_ID, { ...coord(7, 3) }),
+        makeUnit(3, 1, { ...coord(5, 4), hp: 1000 }),
+        makeUnit(4, 1, { ...coord(7, 4), hp: 1000 }),
+      ];
+      const actions = computeAIActions(units, AI_PLAYER_ID, "hard");
+
+      const attackActions = actions.filter(
+        (a): a is Extract<AIAction, { type: "attack" }> => a.type === "attack"
+      );
+      expect(attackActions.length).toBe(2);
+      // Second AI unit should prefer the same target as the first (focus fire bonus)
+      expect(attackActions[1].payload.target_unit_id).toBe(attackActions[0].payload.target_unit_id);
+    });
+  });
+
   it("moves first then attacks in the same turn for a unit", () => {
     // AI unit at (5,2), enemy at (5,5) — distance 3
     // Movement range 3 allows moving to (5,4) or (5,5) area

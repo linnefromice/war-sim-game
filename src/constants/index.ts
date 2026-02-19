@@ -53,6 +53,12 @@ function assertNever(x: never): never {
   throw new Error(`Unexpected value: ${x}`);
 }
 
+export const UNIT_ABILITIES: Record<UnitCategory, { name: string; description: string }> = {
+  fighter: { name: "強襲", description: "移動後の攻撃でダメージ+20%" },
+  tank: { name: "装甲陣地", description: "隣接味方ユニットの防御+10%" },
+  soldier: { name: "迷彩", description: "森林地形での防御+20%" },
+};
+
 export const getAraments = (unitType: UnitCategory): Armament[] => {
   switch (unitType) {
     case "fighter":

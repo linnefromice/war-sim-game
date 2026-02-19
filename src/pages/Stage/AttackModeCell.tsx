@@ -1,18 +1,11 @@
 import React, { useContext, useState } from "react";
 import { ActionContext } from ".";
-import { getTerrainDefenseReduction, loadUnit } from "../../game/gameReducer";
+import { calculateDamage, loadUnit } from "../../game/gameReducer";
 import { CellWithUnit } from "./CellWithUnit";
 import { TerrainTooltip } from "./TerrainTooltip";
 import { isWithinRange } from "./cellUtils";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { TerrainType } from "../../types";
-
-const TERRAIN_LABELS: Record<string, string> = {
-  plain: "平地",
-  forest: "森林",
-  mountain: "山岳",
-  water: "水域",
-};
 
 const getTerrainClass = (terrain: TerrainType): string => {
   switch (terrain) {
@@ -37,8 +30,7 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
       const target = loadUnit(unitId, units);
       const weapon = spec.armaments[selectedArmamentIdx];
       const targetTerrain = scenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
-      const defenseReduction = getTerrainDefenseReduction(targetTerrain);
-      const predictedDamage = Math.floor(weapon.value * (1 - defenseReduction));
+      const { damage: predictedDamage, modifiers } = calculateDamage(targetUnit, target, weapon, targetTerrain, units);
       const remainingHp = Math.max(0, target.status.hp - predictedDamage);
       const isLethal = remainingHp === 0;
 
@@ -64,11 +56,9 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
           <div className={`damage-preview${isLethal ? " damage-preview--lethal" : ""}`}>
             <div className="damage-preview-damage">{`-${predictedDamage} HP`}</div>
             <div className="damage-preview-remaining">{`\u2192 ${remainingHp} HP`}</div>
-            {defenseReduction > 0 && (
-              <div className="damage-preview-terrain">
-                {TERRAIN_LABELS[targetTerrain]} DEF {Math.round(defenseReduction * 100)}%
-              </div>
-            )}
+            {modifiers.map((mod, i) => (
+              <div key={i} className="damage-preview-modifier">{mod}</div>
+            ))}
             {isLethal && <div className="damage-preview-lethal">DESTROY</div>}
           </div>
         </div>
