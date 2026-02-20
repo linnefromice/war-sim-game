@@ -3,7 +3,7 @@ import { ActionContext } from "./index";
 import { getPlayer } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { saveGame } from "../../game/saveLoad";
-import { AI_PLAYER_ID } from "../../constants";
+import { AI_PLAYER_ID, playerColor } from "../../constants";
 
 export const TurnBanner = () => {
   const { gameState, uiState, dispatch, difficulty } = useContext(ActionContext);
@@ -27,7 +27,7 @@ export const TurnBanner = () => {
       <div className="turn-banner-badge">
         <span
           className="turn-banner-badge-name"
-          style={{ color: `rgb(${player1.rgb[0]}, ${player1.rgb[1]}, ${player1.rgb[2]})` }}
+          style={{ color: playerColor(player1.rgb) }}
         >
           {player1.name}
         </span>
@@ -39,7 +39,7 @@ export const TurnBanner = () => {
         <span className="turn-banner-turn-number">TURN {gameState.turnNumber}</span>
         <span
           className="turn-banner-center-name"
-          style={{ color: `rgb(${activePlayer.rgb[0]}, ${activePlayer.rgb[1]}, ${activePlayer.rgb[2]})` }}
+          style={{ color: playerColor(activePlayer.rgb) }}
         >
           {activePlayer.name}
         </span>
@@ -73,7 +73,7 @@ export const TurnBanner = () => {
       <div className="turn-banner-badge">
         <span
           className="turn-banner-badge-name"
-          style={{ color: `rgb(${player2.rgb[0]}, ${player2.rgb[1]}, ${player2.rgb[2]})` }}
+          style={{ color: playerColor(player2.rgb) }}
         >
           {player2.name}
         </span>

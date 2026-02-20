@@ -2,6 +2,11 @@ import { Armament, UnitCategory } from "../types";
 
 export const AI_PLAYER_ID = 2;
 
+export const playerColor = (rgb: [number, number, number], alpha?: number): string => {
+  if (alpha !== undefined) return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+};
+
 const FIGHTER_ARMAMENTS: Armament[] = [
   {
     name: "Machine gun",

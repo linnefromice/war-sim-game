@@ -5,6 +5,7 @@ import { getPlayer } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { ReplayViewer } from "./ReplayViewer";
 import { computeStatistics, BattleStatistics } from "../../game/statistics";
+import { playerColor } from "../../constants";
 
 export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
   const scenario = useScenario();
@@ -72,7 +73,7 @@ const StatsPanel = ({ stats }: { stats: BattleStatistics }) => {
       <div className="stats-panel-players">
         {stats.perPlayer.map(ps => {
           const player = scenario.players.find(p => p.id === ps.playerId);
-          const color = player ? `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})` : "white";
+          const color = player ? playerColor(player.rgb) : "white";
           return (
             <div key={ps.playerId} className="stats-panel-player">
               <span className="stats-panel-player-name" style={{ color }}>{player?.name ?? `P${ps.playerId}`}</span>
@@ -97,7 +98,7 @@ const StatsPanel = ({ stats }: { stats: BattleStatistics }) => {
         </div>
         {Array.from(stats.perUnit.entries()).map(([unitId, entry]) => {
           const player = scenario.players.find(p => p.id === entry.playerId);
-          const color = player ? `rgba(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]}, 0.7)` : "white";
+          const color = player ? playerColor(player.rgb, 0.7) : "white";
           return (
             <div
               key={unitId}
