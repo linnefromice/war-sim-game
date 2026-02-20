@@ -4,6 +4,7 @@ import { GameAction, GameState } from "../../game/types";
 import { gameReducer, loadUnit } from "../../game/gameReducer";
 import { UnitType } from "../../types";
 import { useScenario } from "../../contexts/ScenarioContext";
+import { playerColor } from "../../constants";
 
 const formatAction = (action: GameAction, units: UnitType[]): string => {
   switch (action.type) {
@@ -111,9 +112,7 @@ export const ReplayViewer = ({
                 <span
                   className="replay-item-player"
                   style={{
-                    color: activePlayer
-                      ? `rgb(${activePlayer.rgb[0]},${activePlayer.rgb[1]},${activePlayer.rgb[2]})`
-                      : undefined,
+                    color: activePlayer ? playerColor(activePlayer.rgb) : undefined,
                   }}
                 >
                   {activePlayer?.name}

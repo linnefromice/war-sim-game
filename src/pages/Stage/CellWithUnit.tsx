@@ -3,6 +3,7 @@ import { ActionContext } from ".";
 import { calculateOrientation, getPlayer, loadUnit } from "../../game/gameReducer";
 import { UnitIcon } from "./UnitIcon";
 import { useScenario } from "../../contexts/ScenarioContext";
+import { playerColor } from "../../constants";
 
 const hpBarClass = (current: number, max: number): string => {
   const ratio = current / max;
@@ -34,8 +35,8 @@ export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, o
   const bgColor = isExhausted
     ? "rgba(0, 0, 0, 0.125)"
     : isActive
-      ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.375)`
-      : `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.125)`;
+      ? playerColor(rgb, 0.375)
+      : playerColor(rgb, 0.125);
 
   let cellContentClassForOrientation = "";
   if (orientation === "RIGHT") cellContentClassForOrientation = "rotate-90";
@@ -48,7 +49,7 @@ export const CellWithUnit = React.memo(({ unitId, onClick }: { unitId: number, o
   return (
     <div
       className={cellClassNames}
-      style={{ backgroundColor: bgColor, position: "relative" }}
+      style={{ backgroundColor: bgColor }}
       onClick={onClick}
     >
       {!isExhausted && (status.moved || status.attacked) && (

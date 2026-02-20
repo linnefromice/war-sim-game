@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from "react";
 import "./Stage.scss"
-import { ActionType, PayloadAttackActionType, PayloadMoveActionType, PayloadType, StateActionMenuType } from "../../types";
+import { DispatchAction, StateActionMenuType } from "../../types";
 import { INITIAL_ACTION_MENU, uiReducer, UIAction } from "./logics";
 import { Cell } from "./Cell";
 import { tutorialScenario } from "../../scenarios/tutorial";
@@ -15,16 +15,7 @@ import { AIDifficulty, AIAction, computeAIActions } from "../../game/ai";
 import { ScenarioProvider } from "../../contexts/ScenarioContext";
 import { UnitStatusSummary } from "./UnitStatusSummary";
 import { BattleLog } from "./BattleLog";
-
-const AI_PLAYER_ID = 2;
-
-const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
-  return 'x' in action && 'y' in action && !('target_unit_id' in action);
-}
-
-const isPayloadAttackAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadAttackActionType => {
-  return 'target_unit_id' in action && 'armament_idx' in action;
-}
+import { AI_PLAYER_ID } from "../../constants";
 
 const initialGameState: GameState = {
   activePlayerId: 1,
@@ -37,7 +28,7 @@ const initialGameState: GameState = {
 export const ActionContext = createContext<{
   gameState: GameState;
   uiState: StateActionMenuType;
-  dispatch: (action: { type: ActionType; payload?: PayloadType }) => void;
+  dispatch: (action: DispatchAction) => void;
   uiDispatch: (action: UIAction) => void;
   difficulty?: AIDifficulty;
   onRestart?: () => void;
@@ -45,7 +36,7 @@ export const ActionContext = createContext<{
   gameState: initialGameState,
   uiState: INITIAL_ACTION_MENU,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  dispatch: (_: { type: ActionType; payload?: PayloadType }) => {},
+  dispatch: (_: DispatchAction) => {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   uiDispatch: (_: UIAction) => {},
 });
@@ -55,78 +46,64 @@ export const Stage = ({ difficulty, onRestart, loadedState }: { difficulty?: AID
   const [uiState, uiDispatch] = useReducer(uiReducer, INITIAL_ACTION_MENU);
   const pendingGameAction = useRef<GameAction | null>(null);
 
-  const dispatch = (action: { type: ActionType; payload?: PayloadType }) => {
-    const { type, payload } = action;
-
+  const dispatch = (action: DispatchAction) => {
     // Block all actions during animation except ANIMATION_COMPLETE
-    if (uiState.animationState.type !== "idle" && type !== "ANIMATION_COMPLETE") return;
+    if (uiState.animationState.type !== "idle" && action.type !== "ANIMATION_COMPLETE") return;
 
-    switch (type) {
+    switch (action.type) {
       case "OPEN_MENU": {
-        if (payload?.running_unit_id === undefined) return;
-        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        const unit = loadUnit(action.unitId, gameState.units);
         if (unit.playerId !== gameState.activePlayerId) {
-          uiDispatch({ type: "INSPECT_UNIT", unitId: payload.running_unit_id });
+          uiDispatch({ type: "INSPECT_UNIT", unitId: action.unitId });
           return;
         }
-        uiDispatch({ type: "OPEN_MENU", unitId: payload.running_unit_id });
+        uiDispatch({ type: "OPEN_MENU", unitId: action.unitId });
         break;
       }
       case "CLOSE_MENU":
         uiDispatch({ type: "CLOSE_MENU" });
         break;
       case "SELECT_MOVE": {
-        if (payload?.running_unit_id === undefined) return;
-        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        const unit = loadUnit(action.unitId, gameState.units);
         if (unit.playerId !== gameState.activePlayerId) return;
         uiDispatch({ type: "SELECT_MOVE" });
         break;
       }
       case "SELECT_ATTACK": {
-        if (payload?.running_unit_id === undefined) return;
-        if (payload.action === undefined) return;
-        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        const unit = loadUnit(action.unitId, gameState.units);
         if (unit.playerId !== gameState.activePlayerId) return;
-        if (!isPayloadAttackAction(payload.action)) return;
-        uiDispatch({ type: "SELECT_ATTACK", payload: payload.action });
+        uiDispatch({ type: "SELECT_ATTACK", payload: action.attack });
         break;
       }
       case "DO_MOVE": {
-        if (payload?.running_unit_id === undefined) return;
-        if (payload.action === undefined) return;
-        if (!isPayloadMoveAction(payload.action)) return;
-        const unit = loadUnit(payload.running_unit_id, gameState.units);
+        const unit = loadUnit(action.unitId, gameState.units);
         const from = unit.status.coordinate;
-        const to = { x: payload.action.x, y: payload.action.y };
-        uiDispatch({ type: "ANIMATION_START_MOVE", unitId: payload.running_unit_id, from, to });
+        const to = { x: action.move.x, y: action.move.y };
+        uiDispatch({ type: "ANIMATION_START_MOVE", unitId: action.unitId, from, to });
         pendingGameAction.current = {
           type: "DO_MOVE",
-          unitId: payload.running_unit_id,
-          payload: payload.action,
+          unitId: action.unitId,
+          payload: action.move,
         };
         break;
       }
       case "DO_ATTACK": {
-        if (payload?.running_unit_id === undefined) return;
-        if (payload.action === undefined) return;
-        if (!isPayloadAttackAction(payload.action)) return;
-        const unit = loadUnit(payload.running_unit_id, gameState.units);
-        const target = loadUnit(payload.action.target_unit_id, gameState.units);
-        const armament = unit.spec.armaments[payload.action.armament_idx];
+        const unit = loadUnit(action.unitId, gameState.units);
+        const target = loadUnit(action.attack.target_unit_id, gameState.units);
+        const armament = unit.spec.armaments[action.attack.armament_idx];
         const targetTerrain = tutorialScenario.terrain[target.status.coordinate.y][target.status.coordinate.x];
         const { damage } = calculateDamage(unit, target, armament, targetTerrain, gameState.units);
         const destroyed = target.status.hp - damage <= 0;
-        uiDispatch({ type: "ANIMATION_START_ATTACK", targetId: payload.action.target_unit_id, damage, destroyed });
+        uiDispatch({ type: "ANIMATION_START_ATTACK", targetId: action.attack.target_unit_id, damage, destroyed });
         pendingGameAction.current = {
           type: "DO_ATTACK",
-          unitId: payload.running_unit_id,
-          payload: payload.action,
+          unitId: action.unitId,
+          payload: action.attack,
         };
         break;
       }
       case "UNDO_MOVE": {
-        if (payload?.running_unit_id === undefined) return;
-        gameDispatch({ type: "UNDO_MOVE", unitId: payload.running_unit_id });
+        gameDispatch({ type: "UNDO_MOVE", unitId: action.unitId });
         uiDispatch({ type: "RESET" });
         break;
       }
@@ -217,27 +194,23 @@ const StageContent = () => {
               if (uiState.targetUnitId) {
                 dispatch({
                   type: "DO_MOVE",
-                  payload: {
-                    running_unit_id: uiState.targetUnitId,
-                    action: { x, y },
-                  },
+                  unitId: uiState.targetUnitId,
+                  move: { x, y },
                 });
               }
             } else if (uiState.activeActionOption === "ATTACK") {
               if (uiState.targetUnitId && unitId) {
                 dispatch({
                   type: "DO_ATTACK",
-                  payload: {
-                    running_unit_id: uiState.targetUnitId,
-                    action: {
-                      target_unit_id: unitId,
-                      armament_idx: uiState.selectedArmamentIdx ?? 0,
-                    },
+                  unitId: uiState.targetUnitId,
+                  attack: {
+                    target_unit_id: unitId,
+                    armament_idx: uiState.selectedArmamentIdx ?? 0,
                   },
                 });
               }
             } else if (unitId) {
-              dispatch({ type: "OPEN_MENU", payload: { running_unit_id: unitId } });
+              dispatch({ type: "OPEN_MENU", unitId });
             }
           } else {
             e.preventDefault();
@@ -261,7 +234,7 @@ const StageContent = () => {
           const nextIdx = (currentIdx + 1) % playerUnits.length;
           const nextUnit = playerUnits[nextIdx];
 
-          dispatch({ type: "OPEN_MENU", payload: { running_unit_id: nextUnit.spec.id } });
+          dispatch({ type: "OPEN_MENU", unitId: nextUnit.spec.id });
           uiDispatch({ type: "MOVE_CURSOR", position: nextUnit.status.coordinate });
           break;
         }
@@ -312,19 +285,15 @@ const StageContent = () => {
           case "move":
             dispatch({
               type: "DO_MOVE",
-              payload: {
-                running_unit_id: nextAction.unitId,
-                action: nextAction.payload,
-              },
+              unitId: nextAction.unitId,
+              move: nextAction.payload,
             });
             break;
           case "attack":
             dispatch({
               type: "DO_ATTACK",
-              payload: {
-                running_unit_id: nextAction.unitId,
-                action: nextAction.payload,
-              },
+              unitId: nextAction.unitId,
+              attack: nextAction.payload,
             });
             break;
           case "turn_end":

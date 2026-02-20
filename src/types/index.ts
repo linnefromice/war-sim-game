@@ -4,8 +4,16 @@ export type ActionOptionType = typeof ACTION_OPTIONS[number]
 const ORIENTATIONS = ["UP", "DOWN", "LEFT", "RIGHT"] as const
 export type OrientationType = typeof ORIENTATIONS[number]
 
-const ACTIONS = ["OPEN_MENU", "CLOSE_MENU", "TURN_END", "SELECT_MOVE", "SELECT_ATTACK", "DO_MOVE", "DO_ATTACK", "UNDO_MOVE", "ANIMATION_START_MOVE", "ANIMATION_START_ATTACK", "ANIMATION_START_TURN_CHANGE", "ANIMATION_COMPLETE", "INSPECT_UNIT"] as const
-export type ActionType = typeof ACTIONS[number];
+export type DispatchAction =
+  | { type: "OPEN_MENU"; unitId: number }
+  | { type: "CLOSE_MENU" }
+  | { type: "SELECT_MOVE"; unitId: number }
+  | { type: "SELECT_ATTACK"; unitId: number; attack: PayloadAttackActionType }
+  | { type: "DO_MOVE"; unitId: number; move: PayloadMoveActionType }
+  | { type: "DO_ATTACK"; unitId: number; attack: PayloadAttackActionType }
+  | { type: "UNDO_MOVE"; unitId: number }
+  | { type: "ANIMATION_COMPLETE" }
+  | { type: "TURN_END" }
 
 export type UnitCategory = "fighter" | "tank" | "soldier"
 
@@ -30,10 +38,6 @@ export type StateActionMenuType = {
   cursorPosition: Coordinate | null
 }
 
-export type PayloadType = {
-  running_unit_id?: number,
-  action?: PayloadMoveActionType | PayloadAttackActionType
-}
 export type PayloadMoveActionType = {
   x: number,
   y: number,

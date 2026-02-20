@@ -3,7 +3,7 @@ import { ActionContext } from "./index";
 import { loadUnit } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { UnitIcon } from "./UnitIcon";
-import { UNIT_ABILITIES } from "../../constants";
+import { UNIT_ABILITIES, playerColor } from "../../constants";
 
 export const UnitDetailPanel = () => {
   const {
@@ -27,9 +27,7 @@ export const UnitDetailPanel = () => {
   const { spec, status, playerId } = loadUnit(displayUnitId, units);
   const isEnemy = playerId !== activePlayerId;
   const player = scenario.players.find(p => p.id === playerId);
-  const playerColor = player
-    ? `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})`
-    : "white";
+  const color = player ? playerColor(player.rgb) : "white";
 
   const hpPercent = (status.hp / spec.max_hp) * 100;
   const enPercent = (status.en / spec.max_en) * 100;
@@ -42,7 +40,7 @@ export const UnitDetailPanel = () => {
       </div>
 
       {/* Unit name */}
-      <div className="unit-detail-panel-name" style={{ color: playerColor }}>
+      <div className="unit-detail-panel-name" style={{ color }}>
         {spec.name}
         {isEnemy && <span className="unit-detail-panel-enemy-badge">(敵)</span>}
       </div>

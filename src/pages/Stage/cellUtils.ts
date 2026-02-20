@@ -1,6 +1,15 @@
 import { Coordinate, TerrainType } from "../../types";
 import { tutorialScenario } from "../../scenarios/tutorial";
 
+export const getTerrainClass = (terrain: TerrainType): string => {
+  switch (terrain) {
+    case "forest": return " cell-terrain-forest";
+    case "mountain": return " cell-terrain-mountain";
+    case "water": return " cell-terrain-water";
+    default: return "";
+  }
+};
+
 const getTerrainMovementCost = (terrain: TerrainType): number => {
   switch (terrain) {
     case "plain": return 1;

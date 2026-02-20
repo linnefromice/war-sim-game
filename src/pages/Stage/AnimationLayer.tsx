@@ -5,6 +5,7 @@ import { useScenario } from "../../contexts/ScenarioContext";
 import { UnitIcon } from "./UnitIcon";
 import { Coordinate, UnitCategory } from "../../types";
 import { CELL_SIZE, CELL_BORDER, CELL_INTERVAL, GRID_OFFSET } from "./layoutConstants";
+import { playerColor } from "../../constants";
 
 export const MOVE_DURATION = 300;
 export const ATTACK_DURATION = 600;
@@ -82,7 +83,7 @@ const TurnChangeAnimation = ({ nextPlayerId }: { nextPlayerId: number }) => {
   return (
     <div className="turn-change-overlay">
       <div className="turn-change-banner" style={{
-        color: `rgb(${player.rgb[0]}, ${player.rgb[1]}, ${player.rgb[2]})`,
+        color: playerColor(player.rgb),
       }}>
         <div className="turn-change-label">TURN</div>
         <div className="turn-change-name">{player.name}</div>
