@@ -2,10 +2,7 @@ import fighterImg from "../../assets/fighter.jpg";
 import tankImg from "../../assets/tank.jpg";
 import soldierImg from "../../assets/army.jpg";
 import { UnitCategory } from "../../types";
-
-function assertNever(x: never): never {
-  throw new Error(`Unexpected value: ${x}`);
-}
+import { assertNever } from "../../constants";
 
 const unitImageMap: Record<UnitCategory, string> = {
   fighter: fighterImg,

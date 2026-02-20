@@ -1,5 +1,7 @@
 import { Armament, UnitCategory } from "../types";
 
+export const AI_PLAYER_ID = 2;
+
 const FIGHTER_ARMAMENTS: Armament[] = [
   {
     name: "Machine gun",
@@ -49,7 +51,7 @@ const BATTLE_SOLDIER_ARMAMENTS: Armament[] = [
   },
 ]
 
-function assertNever(x: never): never {
+export function assertNever(x: never): never {
   throw new Error(`Unexpected value: ${x}`);
 }
 

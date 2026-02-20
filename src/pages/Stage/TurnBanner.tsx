@@ -3,8 +3,7 @@ import { ActionContext } from "./index";
 import { getPlayer } from "../../game/gameReducer";
 import { useScenario } from "../../contexts/ScenarioContext";
 import { saveGame } from "../../game/saveLoad";
-
-const AI_PLAYER_ID = 2;
+import { AI_PLAYER_ID } from "../../constants";
 
 export const TurnBanner = () => {
   const { gameState, uiState, dispatch, difficulty } = useContext(ActionContext);

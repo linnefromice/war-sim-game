@@ -2,17 +2,8 @@ import React, { useContext, useState } from "react";
 import { ActionContext } from ".";
 import { CellWithUnit } from "./CellWithUnit";
 import { TerrainTooltip } from "./TerrainTooltip";
+import { getTerrainClass } from "./cellUtils";
 import { useScenario } from "../../contexts/ScenarioContext";
-import { TerrainType } from "../../types";
-
-const getTerrainClass = (terrain: TerrainType): string => {
-  switch (terrain) {
-    case "forest": return " cell-terrain-forest";
-    case "mountain": return " cell-terrain-mountain";
-    case "water": return " cell-terrain-water";
-    default: return "";
-  }
-};
 
 export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, unitId?: number }) => {
   const { dispatch } = useContext(ActionContext);

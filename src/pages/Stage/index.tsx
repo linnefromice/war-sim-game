@@ -15,8 +15,7 @@ import { AIDifficulty, AIAction, computeAIActions } from "../../game/ai";
 import { ScenarioProvider } from "../../contexts/ScenarioContext";
 import { UnitStatusSummary } from "./UnitStatusSummary";
 import { BattleLog } from "./BattleLog";
-
-const AI_PLAYER_ID = 2;
+import { AI_PLAYER_ID } from "../../constants";
 
 const isPayloadMoveAction = (action: PayloadMoveActionType | PayloadAttackActionType): action is PayloadMoveActionType => {
   return 'x' in action && 'y' in action && !('target_unit_id' in action);
