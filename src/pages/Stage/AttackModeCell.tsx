@@ -34,13 +34,11 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
             unitId={unitId}
             onClick={() => dispatch({
               type: "DO_ATTACK",
-              payload: {
-                running_unit_id: targetUnitId,
-                action: {
-                  target_unit_id: unitId,
-                  armament_idx: selectedArmamentIdx
-                }
-              }
+              unitId: targetUnitId,
+              attack: {
+                target_unit_id: unitId,
+                armament_idx: selectedArmamentIdx,
+              },
             })}
           />
           <div className={`damage-preview${isLethal ? " damage-preview--lethal" : ""}`}>

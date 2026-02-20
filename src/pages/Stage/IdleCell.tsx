@@ -13,10 +13,7 @@ export const IdleCell = React.memo(({ x, y, unitId }: { x: number, y: number, un
   if (unitId) {
     return <CellWithUnit
       unitId={unitId}
-      onClick={() => dispatch({
-        type: "OPEN_MENU",
-        payload: { running_unit_id: unitId }
-      })}
+      onClick={() => dispatch({ type: "OPEN_MENU", unitId })}
     />;
   }
 

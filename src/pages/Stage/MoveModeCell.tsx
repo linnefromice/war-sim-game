@@ -26,13 +26,8 @@ export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: num
           onClick={
             () => dispatch({
               type: "DO_MOVE",
-              payload: {
-                running_unit_id: spec.id,
-                action: {
-                  x,
-                  y
-                }
-              }
+              unitId: spec.id,
+              move: { x, y },
             })
           }
         >
