@@ -193,6 +193,7 @@ const updateUnitsByAttack = (
 // --- Game Reducer (no React dependency) ---
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
+  if (action.type === "LOAD_STATE") return action.state;
   if (state.phase.type === "finished") return state;
 
   switch (action.type) {

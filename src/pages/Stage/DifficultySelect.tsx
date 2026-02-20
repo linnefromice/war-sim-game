@@ -1,4 +1,5 @@
 import { AIDifficulty } from "../../game/ai";
+import { hasSavedGame } from "../../game/saveLoad";
 import "./DifficultySelect.scss";
 
 const DIFFICULTIES: { key: AIDifficulty; label: string; description: string }[] = [
@@ -7,7 +8,9 @@ const DIFFICULTIES: { key: AIDifficulty; label: string; description: string }[] 
   { key: "hard", label: "上級", description: "集中砲火・地形活用・撤退判断を行います。" },
 ];
 
-export const DifficultySelect = ({ onSelect }: { onSelect: (d: AIDifficulty) => void }) => {
+export const DifficultySelect = ({ onSelect, onLoad }: { onSelect: (d: AIDifficulty) => void; onLoad?: () => void }) => {
+  const savedExists = hasSavedGame();
+
   return (
     <div className="difficulty-select">
       <h2 className="difficulty-select-title">AI Difficulty</h2>
@@ -25,6 +28,11 @@ export const DifficultySelect = ({ onSelect }: { onSelect: (d: AIDifficulty) => 
           </button>
         ))}
       </div>
+      {savedExists && onLoad && (
+        <button className="difficulty-select-load-btn" onClick={onLoad}>
+          セーブデータをロード
+        </button>
+      )}
     </div>
   );
 };

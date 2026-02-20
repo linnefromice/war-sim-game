@@ -91,4 +91,28 @@
       line-height: 1.5;
     }
   }
+
+  &-load-btn {
+    margin-top: 8px;
+    padding: 12px 32px;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--color-accent-cyan);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background-color 200ms ease, border-color 200ms ease, transform 100ms ease;
+
+    &:hover {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: rgba(0, 212, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
 }
