@@ -93,10 +93,7 @@ export const ActionButtons = () => {
         }
         onClick={() => {
           setIsAttacking(false);
-          dispatch({
-            type: "SELECT_MOVE",
-            payload: { running_unit_id: spec.id },
-          });
+          dispatch({ type: "SELECT_MOVE", unitId: spec.id });
         }}
         disabled={status.moved}
       >
@@ -108,10 +105,7 @@ export const ActionButtons = () => {
         className="action-menu-btn"
         onClick={() => {
           setIsAttacking(false);
-          dispatch({
-            type: "UNDO_MOVE",
-            payload: { running_unit_id: spec.id },
-          });
+          dispatch({ type: "UNDO_MOVE", unitId: spec.id });
         }}
         disabled={!status.moved || status.attacked}
       >
@@ -155,12 +149,10 @@ export const ActionButtons = () => {
                   if (isDisabled) return;
                   dispatch({
                     type: "SELECT_ATTACK",
-                    payload: {
-                      running_unit_id: spec.id,
-                      action: {
-                        target_unit_id: targetUnitId,
-                        armament_idx: idx,
-                      },
+                    unitId: spec.id,
+                    attack: {
+                      target_unit_id: targetUnitId,
+                      armament_idx: idx,
                     },
                   });
                 }}

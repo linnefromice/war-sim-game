@@ -38,7 +38,7 @@ export const UnitStatusSummary = () => {
           <button
             key={unit.spec.id}
             className={`unit-status-summary-item ${isExhausted ? "unit-status-summary-item--exhausted" : ""}`}
-            onClick={() => dispatch({ type: "OPEN_MENU", payload: { running_unit_id: unit.spec.id } })}
+            onClick={() => dispatch({ type: "OPEN_MENU", unitId: unit.spec.id })}
           >
             <UnitIcon unitType={unit.spec.unit_type} className="unit-status-summary-icon" />
             <span className={`unit-status-summary-badge unit-status-summary-badge--${status}`}>
