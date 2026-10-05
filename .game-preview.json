@@ -1,0 +1,8 @@
+{
+  "id": "war-sim-game",
+  "title": "元の戦略ゲーム",
+  "engine": "vite",
+  "build": "yarn build --base ./",
+  "out": "dist",
+  "entry": "index.html"
+}
