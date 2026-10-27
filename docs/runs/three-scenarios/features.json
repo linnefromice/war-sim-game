@@ -8,7 +8,9 @@
   "browser_mouse_keyboard_touch": true,
   "responsive_review": true,
   "self_review": true,
-  "ci": false,
+  "ci": true,
   "production_coverage_all_four_metrics_80_percent": true,
-  "minimum_width_all_four_maps": true
+  "minimum_width_all_four_maps": true,
+  "unintended_initial_preview_removed": true,
+  "cloudflare_skip_verified": true
 }
