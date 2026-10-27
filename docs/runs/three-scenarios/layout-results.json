@@ -1,0 +1,74 @@
+[
+  {
+    "width": 320,
+    "scenario": "Tutorial Battle",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 320,
+    "scenario": "はじめの射程",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 320,
+    "scenario": "混成小隊",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 320,
+    "scenario": "森の交差点",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 768,
+    "scenario": "Tutorial Battle",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 768,
+    "scenario": "はじめの射程",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 768,
+    "scenario": "混成小隊",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 768,
+    "scenario": "森の交差点",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 1366,
+    "scenario": "Tutorial Battle",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 1366,
+    "scenario": "はじめの射程",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 1366,
+    "scenario": "混成小隊",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  },
+  {
+    "width": 1366,
+    "scenario": "森の交差点",
+    "controlsBelowBoard": true,
+    "documentOverflow": false
+  }
+]

@@ -9,6 +9,7 @@ export const TurnBanner = () => {
   const { gameState, uiState, dispatch, difficulty } = useContext(ActionContext);
   const scenario = useScenario();
   const [saveFlash, setSaveFlash] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const activePlayer = getPlayer(gameState.activePlayerId, scenario.players);
   const player1 = scenario.players[0];
@@ -17,7 +18,7 @@ export const TurnBanner = () => {
   const player2Units = gameState.units.filter(u => u.playerId === 2);
 
   const isEndTurnDisabled =
-    gameState.activePlayerId === AI_PLAYER_ID ||
+    (!!difficulty && gameState.activePlayerId === AI_PLAYER_ID) ||
     uiState.animationState.type !== "idle" ||
     gameState.phase.type === "finished";
 
@@ -44,7 +45,7 @@ export const TurnBanner = () => {
           {activePlayer.name}
         </span>
         <span className="turn-banner-center-label">TURN</span>
-        {gameState.activePlayerId === AI_PLAYER_ID && (
+        {difficulty && gameState.activePlayerId === AI_PLAYER_ID && (
           <span className="turn-banner-ai-badge">AI</span>
         )}
         <button
@@ -57,10 +58,13 @@ export const TurnBanner = () => {
         <button
           className="turn-banner-end-turn-btn"
           onClick={() => {
-            if (difficulty) {
-              saveGame(gameState, difficulty);
+            try {
+              saveGame(gameState, difficulty, scenario.id);
+              setSaveError("");
               setSaveFlash(true);
               setTimeout(() => setSaveFlash(false), 1500);
+            } catch {
+              setSaveError("保存できませんでした。ブラウザの保存設定を確認してください。");
             }
           }}
           disabled={gameState.phase.type === "finished" || uiState.animationState.type !== "idle"}
@@ -68,6 +72,8 @@ export const TurnBanner = () => {
           {saveFlash ? "保存済" : "保存"}
         </button>
       </div>
+
+      {saveError && <p role="alert">{saveError}</p>}
 
       {/* Right badge */}
       <div className="turn-banner-badge">

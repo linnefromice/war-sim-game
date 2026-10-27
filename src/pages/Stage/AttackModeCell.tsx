@@ -15,6 +15,9 @@ export const AttackModeCell = React.memo(({ x, y, unitId, targetUnitId, selected
   const attack_range = spec.armaments[selectedArmamentIdx].range;
 
   if (isWithinRange(status.coordinate, { x, y }, attack_range)) {
+    if (unitId && loadUnit(unitId, units).playerId === targetUnit.playerId) {
+      return <CellWithUnit unitId={unitId} onClick={() => null} />;
+    }
     if (unitId) {
       // Calculate damage preview with terrain defense
       const target = loadUnit(unitId, units);

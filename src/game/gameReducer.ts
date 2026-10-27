@@ -1,5 +1,7 @@
 import { UnitType, Armament, OrientationType, Player, PayloadMoveActionType, PayloadAttackActionType, TerrainType } from "../types";
 import { tutorialScenario } from "../scenarios/tutorial";
+import { Scenario } from "../types/scenario";
+import { isWithinMoveRange } from "./movement";
 import { GameState, GameAction } from "./types";
 import { manhattanDistance } from "./utils";
 
@@ -133,13 +135,14 @@ export const removeUnit = (units: UnitType[], targetId: number): UnitType[] => {
 const updateUnitsByMove = (
   oldUnits: UnitType[],
   unitInAction: UnitType,
-  payloadAction: PayloadMoveActionType
+  payloadAction: PayloadMoveActionType,
+  scenario: Scenario,
 ): UnitType[] => {
   const { x, y } = payloadAction;
-  if (x < 0 || x >= tutorialScenario.gridSize.cols || y < 0 || y >= tutorialScenario.gridSize.rows) return oldUnits;
+  if (x < 0 || x >= scenario.gridSize.cols || y < 0 || y >= scenario.gridSize.rows) return oldUnits;
 
   // Block movement to water terrain
-  const terrain = tutorialScenario.terrain[y][x];
+  const terrain = scenario.terrain[y][x];
   if (terrain === "water") return oldUnits;
 
   const updatedUnit = {
@@ -157,13 +160,14 @@ const updateUnitsByMove = (
 const updateUnitsByAttack = (
   oldUnits: UnitType[],
   unitInAction: UnitType,
-  payloadAction: PayloadAttackActionType
+  payloadAction: PayloadAttackActionType,
+  scenario: Scenario,
 ): UnitType[] => {
   const armament = unitInAction.spec.armaments[payloadAction.armament_idx];
   if (armament.consumed_en > unitInAction.status.en) return oldUnits;
 
   const attacked = loadUnit(payloadAction.target_unit_id, oldUnits);
-  const targetTerrain = tutorialScenario.terrain[attacked.status.coordinate.y][attacked.status.coordinate.x];
+  const targetTerrain = scenario.terrain[attacked.status.coordinate.y][attacked.status.coordinate.x];
   const { damage: actualDamage } = calculateDamage(unitInAction, attacked, armament, targetTerrain, oldUnits);
   const remainHp = attacked.status.hp - actualDamage;
 
@@ -192,36 +196,52 @@ const updateUnitsByAttack = (
 
 // --- Game Reducer (no React dependency) ---
 
-export const gameReducer = (state: GameState, action: GameAction): GameState => {
+export const createInitialGameState = (scenario: Scenario = tutorialScenario): GameState => ({
+  activePlayerId: scenario.players[0].id,
+  units: structuredClone(scenario.units),
+  phase: { type: "playing" }, history: [], turnNumber: 1,
+});
+
+export const gameReducer = (state: GameState, action: GameAction, scenario: Scenario = tutorialScenario): GameState => {
   if (action.type === "LOAD_STATE") return action.state;
   if (state.phase.type === "finished") return state;
 
   switch (action.type) {
     case "DO_MOVE": {
-      const unitInAction = loadUnit(action.unitId, state.units);
-      if (unitInAction.playerId !== state.activePlayerId) return state;
-      const newUnits = updateUnitsByMove(state.units, unitInAction, action.payload);
+      const unitInAction = state.units.find(u => u.spec.id === action.unitId);
+      if (!unitInAction || unitInAction.playerId !== state.activePlayerId) return state;
+      const { x, y } = action.payload;
+      if (unitInAction.status.moved || !Number.isInteger(x) || !Number.isInteger(y)) return state;
+      if (state.units.some(u => u.status.coordinate.x === x && u.status.coordinate.y === y)) return state;
+      if (!isWithinMoveRange(unitInAction.status.coordinate, { x, y }, unitInAction.spec.movement_range, scenario)) return state;
+      const newUnits = updateUnitsByMove(state.units, unitInAction, action.payload, scenario);
       return { ...state, units: newUnits, history: [...state.history, action] };
     }
 
     case "DO_ATTACK": {
-      const unitInAction = loadUnit(action.unitId, state.units);
-      if (unitInAction.playerId !== state.activePlayerId) return state;
-      const newUnits = updateUnitsByAttack(state.units, unitInAction, action.payload);
+      const unitInAction = state.units.find(u => u.spec.id === action.unitId);
+      if (!unitInAction || unitInAction.playerId !== state.activePlayerId) return state;
+      const target = state.units.find(u => u.spec.id === action.payload.target_unit_id);
+      const weapon = unitInAction.spec.armaments[action.payload.armament_idx];
+      if (unitInAction.status.attacked || !Number.isInteger(action.payload.armament_idx) || !weapon || !target) return state;
+      if (target.playerId === unitInAction.playerId || weapon.consumed_en > unitInAction.status.en) return state;
+      if (manhattanDistance(unitInAction.status.coordinate, target.status.coordinate) > weapon.range) return state;
+      const newUnits = updateUnitsByAttack(state.units, unitInAction, action.payload, scenario);
       return { ...state, units: newUnits, history: [...state.history, action] };
     }
 
     case "UNDO_MOVE": {
-      const unit = loadUnit(action.unitId, state.units);
-      if (unit.playerId !== state.activePlayerId) return state;
+      const unit = state.units.find(u => u.spec.id === action.unitId);
+      if (!unit || unit.playerId !== state.activePlayerId) return state;
       if (!unit.status.moved) return state;
+      if (state.units.some(u => u.spec.id !== unit.spec.id && manhattanDistance(u.status.coordinate, unit.status.previousCoordinate) === 0)) return state;
       if (unit.status.attacked) return state;
       const updatedUnit = {
         ...unit,
         status: {
           ...unit.status,
-          coordinate: unit.status.initialCoordinate,
-          previousCoordinate: unit.status.initialCoordinate,
+          coordinate: unit.status.previousCoordinate,
+          previousCoordinate: unit.status.previousCoordinate,
           moved: false,
         },
       };
@@ -242,11 +262,12 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
             en,
             moved: false,
             attacked: false,
+            initialCoordinate: { ...unit.status.coordinate },
           },
         };
       });
 
-      const nextPlayerId = nextPlayer(state.activePlayerId, tutorialScenario.players).id;
+      const nextPlayerId = nextPlayer(state.activePlayerId, scenario.players).id;
       const nextPlayerUnits = resettedUnits.filter((u) => u.playerId === nextPlayerId);
 
       if (nextPlayerUnits.length === 0) {
@@ -258,7 +279,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         };
       }
 
-      const newTurnNumber = nextPlayerId === tutorialScenario.players[0].id
+      const newTurnNumber = nextPlayerId === scenario.players[0].id
         ? state.turnNumber + 1
         : state.turnNumber;
 

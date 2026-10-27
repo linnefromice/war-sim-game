@@ -1,0 +1,62 @@
+ci	Run yarn test	﻿2026-10-27T16:45:21.5108801Z ##[group]Run yarn test
+ci	Run yarn test	2026-10-27T16:45:21.5109105Z yarn test
+ci	Run yarn test	2026-10-27T16:45:21.5168889Z shell: /usr/bin/bash -e {0}
+ci	Run yarn test	2026-10-27T16:45:21.5169185Z ##[endgroup]
+ci	Run yarn test	2026-10-27T16:45:21.6610642Z yarn run v1.22.22
+ci	Run yarn test	2026-10-27T16:45:21.6869356Z $ vitest run
+ci	Run yarn test	2026-10-27T16:45:22.2236614Z 
+ci	Run yarn test	2026-10-27T16:45:22.2239110Z  RUN  v4.0.18 /home/runner/work/war-sim-game/war-sim-game
+ci	Run yarn test	2026-10-27T16:45:22.2239949Z 
+ci	Run yarn test	2026-10-27T16:45:23.4053190Z  ✓ src/game/ai.test.ts (15 tests) 17ms
+ci	Run yarn test	2026-10-27T16:45:23.4174537Z  ✓ src/game/gameReducer.test.ts (67 tests) 30ms
+ci	Run yarn test	2026-10-27T16:45:24.3514331Z  ✓ src/pages/Stage/logics.test.ts (15 tests) 16ms
+ci	Run yarn test	2026-10-27T16:45:25.3234039Z  ✓ src/game/statistics.test.ts (7 tests) 9ms
+ci	Run yarn test	2026-10-27T16:45:27.1691193Z  ✓ src/pages/Stage/Stage.test.tsx (4 tests) 3096ms
+ci	Run yarn test	2026-10-27T16:45:27.1743494Z      ✓ shows action menu when clicking a Player 1 unit, and closes on close button  633ms
+ci	Run yarn test	2026-10-27T16:45:27.1756693Z      ✓ allows a unit to move to a highlighted cell within movement range  446ms
+ci	Run yarn test	2026-10-27T16:45:27.1758641Z      ✓ allows a unit to attack an enemy unit and reduce their HP  1825ms
+ci	Run yarn test	2026-10-27T16:45:27.2420919Z  ✓ src/pages/Stage/StageWin.test.tsx (1 test) 861ms
+ci	Run yarn test	2026-10-27T16:45:27.2423339Z      ✓ shows victory screen when all enemy units are eliminated  859ms
+ci	Run yarn test	2026-10-27T16:45:28.1105348Z  ✓ src/scenarios/scenarios.test.ts (6 tests) 18ms
+ci	Run yarn test	2026-10-27T16:45:29.0802948Z  ✓ src/game/saveLoad.test.ts (15 tests) 20ms
+ci	Run yarn test	2026-10-27T16:45:29.9414462Z  ✓ src/scenarios/victoryTrace.test.ts (6 tests) 17ms
+ci	Run yarn test	2026-10-27T16:45:30.1299796Z  ✓ src/pages/Stage/StageKeyboard.test.tsx (2 tests) 1877ms
+ci	Run yarn test	2026-10-27T16:45:30.1301114Z      ✓ keeps native focus navigation, rejects illegal targets, permits Player 2 and undo  1625ms
+ci	Run yarn test	2026-10-27T16:45:34.1992080Z  ❯ src/App.test.tsx (6 tests | 1 failed) 9513ms
+ci	Run yarn test	2026-10-27T16:45:34.1996705Z      × plays to Player 1 victory, restarts cleanly and switches maps 5017ms
+ci	Run yarn test	2026-10-27T16:45:34.1997687Z      ✓ plays to Player 2 victory, restarts cleanly and switches maps  4006ms
+ci	Run yarn test	2026-10-27T16:45:34.1998515Z      ✓ reports unreadable saves without losing the scenario menu 138ms
+ci	Run yarn test	2026-10-27T16:45:34.1999327Z    ✓ resumes a saved hotseat turn and clears it when starting tutorial 141ms
+ci	Run yarn test	2026-10-27T16:45:34.2000055Z    ✓ loads v1 tutorial saves in their existing CPU mode 55ms
+ci	Run yarn test	2026-10-27T16:45:34.2000780Z    ✓ keeps the match playable and reports unavailable save storage 155ms
+ci	Run yarn test	2026-10-27T16:45:34.2026406Z 
+ci	Run yarn test	2026-10-27T16:45:34.2033164Z ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ci	Run yarn test	2026-10-27T16:45:34.2033769Z 
+ci	Run yarn test	2026-10-27T16:45:34.2043633Z  FAIL  src/App.test.tsx > hotseat application lifecycle > plays to Player 1 victory, restarts cleanly and switches maps
+ci	Run yarn test	2026-10-27T16:45:34.2049192Z Error: Test timed out in 5000ms.
+ci	Run yarn test	2026-10-27T16:45:34.2050914Z If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ci	Run yarn test	2026-10-27T16:45:34.2052978Z  ❯ src/App.test.tsx:16:17
+ci	Run yarn test	2026-10-27T16:45:34.2135436Z      14|   beforeEach(() => { Object.defineProperty(HTMLElement.prototype, "scr…
+ci	Run yarn test	2026-10-27T16:45:34.2137148Z      15|   afterEach(() => vi.useRealTimers());
+ci	Run yarn test	2026-10-27T16:45:34.2138920Z      16|   it.each([1, 2])("plays to Player %i victory, restarts cleanly and sw…
+ci	Run yarn test	2026-10-27T16:45:34.2140133Z        |                 ^
+ci	Run yarn test	2026-10-27T16:45:34.2141718Z      17|     const user = userEvent.setup();
+ci	Run yarn test	2026-10-27T16:45:34.2143808Z      18|     const { container } = render(<App />);
+ci	Run yarn test	2026-10-27T16:45:34.2145279Z 
+ci	Run yarn test	2026-10-27T16:45:34.2146031Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+ci	Run yarn test	2026-10-27T16:45:34.2146690Z 
+ci	Run yarn test	2026-10-27T16:45:34.2162059Z 
+ci	Run yarn test	2026-10-27T16:45:34.2162694Z  Test Files  1 failed | 10 passed (11)
+ci	Run yarn test	2026-10-27T16:45:34.2163558Z       Tests  1 failed | 143 passed (144)
+ci	Run yarn test	2026-10-27T16:45:34.2164105Z    Start at  16:45:22
+ci	Run yarn test	2026-10-27T16:45:34.2164791Z    Duration  11.97s (transform 1.11s, setup 732ms, import 2.13s, tests 15.47s, environment 7.43s)
+ci	Run yarn test	2026-10-27T16:45:34.2165209Z 
+ci	Run yarn test	2026-10-27T16:45:34.2165215Z 
+ci	Run yarn test	2026-10-27T16:45:34.2185368Z ##[error]Error: Test timed out in 5000ms.
+ci	Run yarn test	If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ci	Run yarn test	 ❯ src/App.test.tsx:16:17
+ci	Run yarn test	
+ci	Run yarn test	
+ci	Run yarn test	2026-10-27T16:45:34.2877048Z error Command failed with exit code 1.
+ci	Run yarn test	2026-10-27T16:45:34.2882826Z info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+ci	Run yarn test	2026-10-27T16:45:34.2986216Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,1698 @@
+{
+  "scenarioId": "first-contact",
+  "winner": 1,
+  "halfTurns": 7,
+  "actionCount": 12,
+  "steps": [
+    {
+      "action": {
+        "type": "DO_MOVE",
+        "unitId": 1,
+        "payload": {
+          "x": 0,
+          "y": 2
+        }
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 3
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 3
+              },
+              "moved": true,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          }
+        ],
+        "turnNumber": 1
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 2,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 3
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 1
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 3
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 2
+      }
+    },
+    {
+      "action": {
+        "type": "DO_MOVE",
+        "unitId": 1,
+        "payload": {
+          "x": 0,
+          "y": 1
+        }
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "moved": true,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          }
+        ],
+        "turnNumber": 2
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 2,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 2
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 2
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 3
+      }
+    },
+    {
+      "action": {
+        "type": "DO_MOVE",
+        "unitId": 1,
+        "payload": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "moved": true,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        ],
+        "turnNumber": 3
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 2,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 3
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 1
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 4
+      }
+    },
+    {
+      "action": {
+        "type": "DO_MOVE",
+        "unitId": 1,
+        "payload": {
+          "x": 1,
+          "y": 0
+        }
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 1,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "moved": true,
+              "attacked": false
+            },
+            "playerId": 1
+          },
+          {
+            "spec": {
+              "id": 2,
+              "name": "P2-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 100,
+              "coordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 4,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 2
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 1,
+              "y": 0
+            }
+          }
+        ],
+        "turnNumber": 4
+      }
+    },
+    {
+      "action": {
+        "type": "DO_ATTACK",
+        "unitId": 1,
+        "payload": {
+          "target_unit_id": 2,
+          "armament_idx": 2
+        }
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 25,
+              "coordinate": {
+                "x": 1,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "moved": true,
+              "attacked": true
+            },
+            "playerId": 1
+          }
+        ],
+        "phase": {
+          "type": "playing"
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          {
+            "type": "DO_ATTACK",
+            "unitId": 1,
+            "payload": {
+              "target_unit_id": 2,
+              "armament_idx": 2
+            }
+          }
+        ],
+        "turnNumber": 4
+      }
+    },
+    {
+      "action": {
+        "type": "TURN_END"
+      },
+      "state": {
+        "activePlayerId": 1,
+        "units": [
+          {
+            "spec": {
+              "id": 1,
+              "name": "P1-soldier",
+              "unit_type": "soldier",
+              "max_hp": 200,
+              "max_en": 100,
+              "movement_range": 1,
+              "armaments": [
+                {
+                  "name": "Assault rifle",
+                  "value": 100,
+                  "range": 2,
+                  "consumed_en": 10
+                },
+                {
+                  "name": "Grenade launcher",
+                  "value": 300,
+                  "range": 2,
+                  "consumed_en": 20
+                },
+                {
+                  "name": "Suicide drone",
+                  "value": 500,
+                  "range": 3,
+                  "consumed_en": 75
+                }
+              ]
+            },
+            "status": {
+              "hp": 200,
+              "en": 35,
+              "coordinate": {
+                "x": 1,
+                "y": 0
+              },
+              "previousCoordinate": {
+                "x": 0,
+                "y": 0
+              },
+              "initialCoordinate": {
+                "x": 1,
+                "y": 0
+              },
+              "moved": false,
+              "attacked": false
+            },
+            "playerId": 1
+          }
+        ],
+        "phase": {
+          "type": "finished",
+          "winner": 1
+        },
+        "history": [
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 1
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "TURN_END"
+          },
+          {
+            "type": "DO_MOVE",
+            "unitId": 1,
+            "payload": {
+              "x": 1,
+              "y": 0
+            }
+          },
+          {
+            "type": "DO_ATTACK",
+            "unitId": 1,
+            "payload": {
+              "target_unit_id": 2,
+              "armament_idx": 2
+            }
+          },
+          {
+            "type": "TURN_END"
+          }
+        ],
+        "turnNumber": 4
+      }
+    }
+  ]
+}

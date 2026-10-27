@@ -1,0 +1,82 @@
+PASS {
+  id: 'first-contact',
+  winner: 1,
+  mode: 'mouse',
+  interactions: 31,
+  gameActions: 12,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'first-contact',
+  winner: 2,
+  mode: 'mouse',
+  interactions: 32,
+  gameActions: 13,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'combined-arms',
+  winner: 1,
+  mode: 'mouse',
+  interactions: 57,
+  gameActions: 21,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'combined-arms',
+  winner: 2,
+  mode: 'mouse',
+  interactions: 58,
+  gameActions: 22,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'crossroads',
+  winner: 1,
+  mode: 'mouse',
+  interactions: 83,
+  gameActions: 39,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'crossroads',
+  winner: 2,
+  mode: 'mouse',
+  interactions: 84,
+  gameActions: 40,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'first-contact',
+  winner: 2,
+  mode: 'keyboard',
+  interactions: 97,
+  gameActions: 13,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'first-contact',
+  winner: 1,
+  mode: 'touch',
+  interactions: 35,
+  gameActions: 12,
+  result: 'PASS',
+  errors: []
+}
+PASS {
+  id: 'crossroads',
+  winner: 2,
+  mode: 'touch',
+  interactions: 88,
+  gameActions: 40,
+  result: 'PASS',
+  errors: []
+}
+PASS layouts 12
