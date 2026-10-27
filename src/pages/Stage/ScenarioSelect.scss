@@ -1,0 +1,35 @@
+.scenario-select { max-width: 1000px; margin: auto; padding: 24px; }
+.scenario-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; margin: 24px 0; }
+.scenario-cards article { padding: 20px; background: var(--glass-bg-solid); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); }
+.scenario-select button, .scenario-header button { padding: 12px 18px; color: var(--color-text-primary); background: #173653; border: 1px solid var(--glass-border-bright); border-radius: 6px; cursor: pointer; }
+button:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+.scenario-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; flex-wrap: wrap; }
+.scenario-header h1 { font-size: 1.4rem; margin: 0; }
+.scenario-header p, .keyboard-help { font-size: 14px; color: var(--color-text-secondary); }
+.keyboard-help { padding: 0 24px; }
+.board-scroll { overflow: auto; max-width: 100%; }
+.play-area { width: max-content; }
+.stage-controls { display: flex; flex-wrap: wrap; gap: 16px; padding: 12px 24px; align-items: flex-start; }
+.stage-controls .action-buttons { position: static; min-width: 180px; max-width: 100%; }
+.stage-controls .unit-detail-panel { position: static; max-width: 100%; box-sizing: border-box; }
+.action-sub-menu-item { color: inherit; text-align: left; width: 100%; font: inherit; }
+@media (max-width: 640px) {
+  .scenario-select { padding: 16px; }
+  .turn-banner { margin: 0 8px 8px; padding: 8px; flex-wrap: wrap; gap: 8px; }
+  .turn-banner-center { flex-wrap: wrap; justify-content: center; gap: 8px; order: 3; width: 100%; }
+  .turn-banner-center-name { font-size: 1rem; }
+  .stage-controls { padding: 8px; }
+  .stage-controls .action-buttons { width: 100%; box-sizing: border-box; }
+  .unit-status-summary { flex-wrap: wrap; }
+  .game-over-panel { max-width: 100%; box-sizing: border-box; padding: 24px 16px; }
+  .game-over-panel-actions { flex-wrap: wrap; justify-content: center; }
+}
+
+.action-sub-menu-item:disabled { opacity: .35; cursor: not-allowed; }
+.board-scroll:focus-visible { outline: 2px solid #fbbf24; outline-offset: -2px; }
+
+.stats-panel { width: min(530px, calc(100% - 24px)); box-sizing: border-box; }
+.stats-panel-header { flex-wrap: wrap; gap: 8px; }
+.stats-panel-units-header, .stats-panel-unit-row { grid-template-columns: minmax(0, 1fr) repeat(3, minmax(32px, auto)); }
+.stats-panel-unit-name { overflow-wrap: anywhere; }
+.replay-panel { box-sizing: border-box; }

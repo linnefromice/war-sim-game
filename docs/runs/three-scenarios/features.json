@@ -1,0 +1,14 @@
+{
+  "tutorial_preserved": true,
+  "three_legal_scenarios": true,
+  "both_winners_traces": true,
+  "hotseat_selection_restart_menu": true,
+  "save_compatibility": true,
+  "lint_build_test": true,
+  "browser_mouse_keyboard_touch": true,
+  "responsive_review": true,
+  "self_review": true,
+  "ci": false,
+  "production_coverage_all_four_metrics_80_percent": true,
+  "minimum_width_all_four_maps": true
+}

@@ -1,0 +1,7 @@
+# Progress
+
+- Stage 0: rules and source inspected; explicit single-agent instruction overrides team rules. Existing source already has CPU and v1 localStorage saves, contrary to request premise. Preserve legacy saves, expose hotseat for all new games. Existing Chromium binaries available; locating existing driver. Design and fixed witness budgets recorded in RUN.md.
+- Stage 1: tutorial unchanged; 3 layouts frozen without revisions. Reducer and terrain BFS bound to scenario. Six legal witnesses PASS: first-contact 12/13 actions, combined-arms 21/22, crossroads 39/40 (P1/P2). All within 200 actions/80 half-turns.
+- Stage 2: hotseat selection, same-map restart, menu, save v2/v1 migration implemented. Reset/undo/invalid actions covered. Controls moved below board with native keyboard weapon buttons.
+- Stage 3: isolated baseline lint/build/108 tests PASS; final project lint/build/144 tests PASS. Existing compatible coverage tools reused without installation or other-repo writes. All four production coverage thresholds exceed 80%. Built-output browser: 9 flows PASS (maximum 97/120 interactions), including both winners on each map, keyboard, touch, replay/statistics, new map/save/resume. Layout 320/768/1366 × all four maps: 12 PASS. Self-review recorded and all material findings fixed. No scope/layout/budget relaxation.
+- Stage 4: prepare commit/push and PR; final CI required before squash. Terminal REPORT/STOPPED to be committed after PR results are available.

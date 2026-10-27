@@ -177,3 +177,15 @@ describe("computeStatistics", () => {
     expect(stats.turnCount).toBe(2);
   });
 });
+
+it("does not retain fighter assault damage after undoing a move", () => {
+  const units = [makeUnit(1, 1, { ...coord(0, 0) }), makeUnit(2, 2, { ...coord(2, 0) })];
+  const history: GameAction[] = [
+    { type: "DO_MOVE", unitId: 1, payload: { x: 1, y: 0 } },
+    { type: "UNDO_MOVE", unitId: 1 },
+    { type: "DO_ATTACK", unitId: 1, payload: { target_unit_id: 2, armament_idx: 0 } },
+  ];
+  const stats = computeStatistics(history, units, makeScenario(units));
+  expect(stats.perUnit.get(1)?.damageDealt).toBe(200);
+  expect(stats.perUnit.get(2)?.damageTaken).toBe(200);
+});

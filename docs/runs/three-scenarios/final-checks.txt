@@ -1,0 +1,62 @@
+yarn run v1.22.22
+$ eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0
+Done in 0.95s.
+yarn run v1.22.22
+$ tsc && vite build
+vite v4.4.9 building for production...
+transforming...
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+✓ 68 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.46 kB │ gzip:  0.30 kB
+dist/assets/tank-bf006209.jpg     105.19 kB
+dist/assets/fighter-07e2bd62.jpg  115.23 kB
+dist/assets/army-2f192d5c.jpg     122.29 kB
+dist/assets/index-ae5d9ce2.css     27.13 kB │ gzip:  5.40 kB
+dist/assets/index-1258a353.js     189.08 kB │ gzip: 60.14 kB
+✓ built in 699ms
+Done in 2.07s.
+yarn run v1.22.22
+$ vitest run
+
+ RUN  v4.0.18 /home/paru/repository/github.com/linnefromice/war-sim-game
+
+ ✓ src/pages/Stage/logics.test.ts (15 tests) 5ms
+ ✓ src/game/statistics.test.ts (7 tests) 4ms
+ ✓ src/game/ai.test.ts (15 tests) 7ms
+ ✓ src/scenarios/scenarios.test.ts (6 tests) 10ms
+ ✓ src/scenarios/victoryTrace.test.ts (6 tests) 7ms
+ ✓ src/game/gameReducer.test.ts (67 tests) 14ms
+ ✓ src/game/saveLoad.test.ts (15 tests) 9ms
+ ✓ src/pages/Stage/StageWin.test.tsx (1 test) 559ms
+     ✓ shows victory screen when all enemy units are eliminated  558ms
+ ✓ src/pages/Stage/StageKeyboard.test.tsx (2 tests) 999ms
+     ✓ keeps native focus navigation, rejects illegal targets, permits Player 2 and undo  883ms
+ ✓ src/pages/Stage/Stage.test.tsx (4 tests) 2210ms
+     ✓ allows a unit to attack an enemy unit and reduce their HP  1540ms
+ ✓ src/App.test.tsx (6 tests) 6874ms
+     ✓ plays to Player 1 victory, restarts cleanly and switches maps  3321ms
+     ✓ plays to Player 2 victory, restarts cleanly and switches maps  3294ms
+
+ Test Files  11 passed (11)
+      Tests  144 passed (144)
+   Start at  01:41:53
+   Duration  7.71s (transform 1.32s, setup 422ms, import 2.11s, tests 10.70s, environment 3.85s)
+
+Done in 8.05s.

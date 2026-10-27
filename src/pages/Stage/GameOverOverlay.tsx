@@ -10,7 +10,7 @@ import { playerColor } from "../../constants";
 export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
   const scenario = useScenario();
   const winner = getPlayer(winnerId, scenario.players);
-  const { gameState, onRestart } = useContext(ActionContext);
+  const { gameState, onRestart, onMenu } = useContext(ActionContext);
   const [showReplay, setShowReplay] = useState(false);
   const [showStats, setShowStats] = useState(false);
 
@@ -20,14 +20,15 @@ export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
   );
 
   return (
-    <div className="game-over-overlay">
+    <div className="game-over-overlay" role="dialog" aria-modal="true" aria-label="対戦結果">
       <div className="game-over-panel">
         <p className="game-over-panel-title">{`Player ${winner.id} Wins!`}</p>
         <p className="game-over-panel-winner">{winner.name}</p>
         <div className="game-over-panel-actions">
           <button className="game-over-btn" onClick={onRestart}>
-            Restart
+            同じ面で再戦
           </button>
+          {onMenu && <button className="game-over-btn" onClick={onMenu}>シナリオ選択へ</button>}
           <button className="game-over-btn" onClick={() => setShowReplay(true)}>
             リプレイ
           </button>
@@ -36,7 +37,7 @@ export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
           </button>
         </div>
       </div>
-      {showStats && <StatsPanel stats={stats} />}
+      {showStats && <StatsPanel stats={stats} onClose={() => setShowStats(false)} />}
       {showReplay && (
         <ReplayViewer
           history={gameState.history}
@@ -48,7 +49,7 @@ export const GameOverOverlay = ({ winnerId }: { winnerId: number }) => {
   );
 };
 
-const StatsPanel = ({ stats }: { stats: BattleStatistics }) => {
+const StatsPanel = ({ stats, onClose }: { stats: BattleStatistics; onClose: () => void }) => {
   const scenario = useScenario();
   const mvpEntry = stats.mvpUnitId ? stats.perUnit.get(stats.mvpUnitId) : null;
   const mvpName = mvpEntry ? mvpEntry.name : "—";
@@ -57,6 +58,7 @@ const StatsPanel = ({ stats }: { stats: BattleStatistics }) => {
     <div className="stats-panel">
       <div className="stats-panel-header">
         <h3 className="stats-panel-title">Battle Statistics</h3>
+        <button onClick={onClose}>統計を閉じる</button>
         <span className="stats-panel-turns">Turn {stats.turnCount}</span>
       </div>
 

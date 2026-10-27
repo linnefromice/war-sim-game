@@ -53,7 +53,7 @@ const makeGameState = (overrides?: Partial<GameState>): GameState => ({
   activePlayerId: 1,
   units: [
     makeUnit(1, 1, { ...coord(3, 8) }),
-    makeUnit(2, 2, { ...coord(5, 2) }),
+    makeUnit(2, 2, { ...coord(3, 7) }),
   ],
   phase: { type: "playing" },
   history: [],
@@ -407,7 +407,7 @@ describe("gameReducer", () => {
         payload: { x: 6, y: 3 },
       });
       const unit = result.units.find((u: UnitType) => u.spec.id === 2)!;
-      expect(unit.status.coordinate).toEqual({ x: 5, y: 2 }); // unchanged
+      expect(unit.status.coordinate).toEqual({ x: 3, y: 7 }); // unchanged
     });
   });
 
@@ -431,7 +431,7 @@ describe("gameReducer", () => {
       const state = makeGameState({
         units: [
           makeUnit(1, 1, { ...coord(3, 8) }),
-          makeUnit(2, 2, { ...coord(5, 2), hp: 100 }), // low HP
+          makeUnit(2, 2, { ...coord(3, 7), hp: 100 }), // low HP
         ],
       });
       const result = gameReducer(state, {
@@ -447,7 +447,7 @@ describe("gameReducer", () => {
       const state = makeGameState({
         units: [
           makeUnit(1, 1, { ...coord(3, 8), en: 10 }), // only 10 EN
-          makeUnit(2, 2, { ...coord(5, 2) }),
+          makeUnit(2, 2, { ...coord(3, 7) }),
         ],
       });
       const result = gameReducer(state, {
@@ -550,7 +550,7 @@ describe("gameReducer", () => {
             initialCoordinate: { x: 3, y: 8 },
             moved: true,
           }),
-          makeUnit(2, 2, { ...coord(5, 2) }),
+          makeUnit(2, 2, { ...coord(3, 7) }),
         ],
       });
       const result = gameReducer(state, { type: "UNDO_MOVE", unitId: 1 });
@@ -577,7 +577,7 @@ describe("gameReducer", () => {
             moved: true,
             attacked: true,
           }),
-          makeUnit(2, 2, { ...coord(5, 2) }),
+          makeUnit(2, 2, { ...coord(3, 7) }),
         ],
       });
       const result = gameReducer(state, { type: "UNDO_MOVE", unitId: 1 });
@@ -634,7 +634,7 @@ describe("gameReducer", () => {
         activePlayerId: 1,
         units: [
           makeUnit(1, 1, { ...coord(3, 8), en: 195 }),
-          makeUnit(2, 2, { ...coord(5, 2) }),
+          makeUnit(2, 2, { ...coord(3, 7) }),
         ],
       });
       const result = gameReducer(state, { type: "TURN_END" });
@@ -726,7 +726,7 @@ describe("gameReducer", () => {
         activePlayerId: 1,
         units: [
           makeUnit(1, 1, { ...coord(3, 8) }),
-          makeUnit(2, 2, { ...coord(5, 2), hp: 100 }), // will be killed
+          makeUnit(2, 2, { ...coord(3, 7), hp: 100 }), // will be killed
         ],
       });
       const result = gameReducer(state, {
@@ -744,7 +744,7 @@ describe("gameReducer", () => {
         activePlayerId: 1,
         units: [
           makeUnit(1, 1, { ...coord(3, 8) }),
-          makeUnit(2, 2, { ...coord(5, 2), hp: 100 }),
+          makeUnit(2, 2, { ...coord(3, 7), hp: 100 }),
         ],
       });
 
@@ -835,7 +835,7 @@ describe("gameReducer", () => {
       const state = makeGameState({
         units: [
           makeUnit(1, 1, { ...coord(3, 8) }), // plain
-          makeUnit(2, 2, { ...coord(5, 2) }),
+          makeUnit(2, 2, { ...coord(3, 7) }),
         ],
       });
       const result = gameReducer(state, {
@@ -916,7 +916,7 @@ describe("gameReducer", () => {
             initialCoordinate: { x: 3, y: 8 },
             moved: true,
           }),
-          makeUnit(2, 2, { ...coord(5, 2) }),
+          makeUnit(2, 2, { ...coord(3, 7) }),
         ],
       });
       const undoAction = { type: "UNDO_MOVE" as const, unitId: 1 };

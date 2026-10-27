@@ -1,0 +1,6 @@
+first-contact P1: 12 actions, 7 half-turns
+first-contact P2: 13 actions, 8 half-turns
+combined-arms P1: 21 actions, 9 half-turns
+combined-arms P2: 22 actions, 10 half-turns
+crossroads P1: 39 actions, 25 half-turns
+crossroads P2: 40 actions, 26 half-turns

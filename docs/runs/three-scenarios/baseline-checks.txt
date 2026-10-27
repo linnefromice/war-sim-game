@@ -1,0 +1,54 @@
+yarn run v1.22.22
+$ eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0
+Done in 0.78s.
+yarn run v1.22.22
+$ tsc && vite build
+vite v4.4.9 building for production...
+transforming...
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+✓ 67 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.46 kB │ gzip:  0.30 kB
+dist/assets/tank-bf006209.jpg     105.19 kB
+dist/assets/fighter-07e2bd62.jpg  115.23 kB
+dist/assets/army-2f192d5c.jpg     122.29 kB
+dist/assets/index-a9201873.css     27.14 kB │ gzip:  5.20 kB
+dist/assets/index-31e18991.js     184.64 kB │ gzip: 58.23 kB
+✓ built in 691ms
+Done in 1.99s.
+yarn run v1.22.22
+$ vitest run
+
+ RUN  v4.0.18 /tmp/three-scenarios-baseline-6J1pcK
+
+ ✓ src/pages/Stage/logics.test.ts (15 tests) 5ms
+ ✓ src/game/statistics.test.ts (6 tests) 3ms
+ ✓ src/game/ai.test.ts (15 tests) 6ms
+ ✓ src/game/gameReducer.test.ts (67 tests) 11ms
+ ✓ src/pages/Stage/StageWin.test.tsx (1 test) 552ms
+     ✓ shows victory screen when all enemy units are eliminated  552ms
+ ✓ src/pages/Stage/Stage.test.tsx (4 tests) 2205ms
+     ✓ allows a unit to attack an enemy unit and reduce their HP  1544ms
+
+ Test Files  6 passed (6)
+      Tests  108 passed (108)
+   Start at  01:34:43
+   Duration  2.93s (transform 827ms, setup 202ms, import 1.02s, tests 2.78s, environment 1.72s)
+
+Done in 3.26s.

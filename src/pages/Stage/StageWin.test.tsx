@@ -160,6 +160,6 @@ describe("Stage win detection", () => {
     // Victory screen should show
     expect(screen.getByText("Player 1 Wins!")).toBeInTheDocument();
     expect(screen.getAllByText("Hero").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("Restart")).toBeInTheDocument();
+    expect(screen.getByText("同じ面で再戦")).toBeInTheDocument();
   });
 });

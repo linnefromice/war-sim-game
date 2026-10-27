@@ -1,0 +1,36 @@
+yarn run v1.22.22
+$ vitest run src/scenarios/scenarios.test.ts
+
+ RUN  v4.0.18 /home/paru/repository/github.com/linnefromice/war-sim-game
+
+ ❯ src/scenarios/scenarios.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/scenarios/scenarios.test.ts [ src/scenarios/scenarios.test.ts ]
+Error: Failed to resolve import "./index" from "src/scenarios/scenarios.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/paru/repository/github.com/linnefromice/war-sim-game/src/scenarios/scenarios.test.ts:2:26
+  1  |  import { describe, expect, it } from "vitest";
+  2  |  import { scenarios } from "./index";
+     |                             ^
+  3  |  import { createInitialGameState, gameReducer } from "../game/gameReducer";
+  4  |  describe("scenario isolation", () => {
+ ❯ TransformPluginContext._formatLog node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28999:43
+ ❯ TransformPluginContext.error node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28996:14
+ ❯ normalizeUrl node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27119:18
+ ❯ node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27177:32
+ ❯ TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27145:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28797:14
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:22670:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  01:21:55
+   Duration  418ms (transform 18ms, setup 50ms, import 0ms, tests 0ms, environment 273ms)
+
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

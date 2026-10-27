@@ -54,7 +54,7 @@ export const ReplayViewer = ({
   // Build state snapshots for formatting
   const states: GameState[] = [];
   let currentState: GameState = {
-    activePlayerId: 1,
+    activePlayerId: scenario.players[0].id,
     units: initialUnits,
     phase: { type: "playing" },
     history: [],
@@ -62,7 +62,7 @@ export const ReplayViewer = ({
   };
   states.push(currentState);
   for (const action of history) {
-    currentState = gameReducer(currentState, action);
+    currentState = gameReducer(currentState, action, scenario);
     states.push(currentState);
   }
 

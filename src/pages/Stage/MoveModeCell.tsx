@@ -13,7 +13,7 @@ export const MoveModeCell = React.memo(({ x, y, unitId, targetUnitId }: { x: num
   const targetUnit = loadUnit(targetUnitId, units);
   const { spec, status } = targetUnit;
 
-  if (isWithinMoveRange(status.coordinate, { x, y }, spec.movement_range)) {
+  if (isWithinMoveRange(status.coordinate, { x, y }, spec.movement_range, scenario)) {
     return unitId
       ? <CellWithUnit
           unitId={unitId}

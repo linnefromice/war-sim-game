@@ -77,11 +77,21 @@ export const computeStatistics = (
           ...su,
           status: {
             ...su.status,
+            previousCoordinate: su.status.coordinate,
             coordinate: { x: action.payload.x, y: action.payload.y },
             moved: true,
           },
         });
       }
+      continue;
+    }
+
+    if (action.type === "UNDO_MOVE") {
+      const unit = shadowUnits.get(action.unitId);
+      if (unit) shadowUnits.set(action.unitId, {
+        ...unit,
+        status: { ...unit.status, coordinate: unit.status.previousCoordinate, moved: false },
+      });
       continue;
     }
 
