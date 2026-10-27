@@ -21,11 +21,16 @@ Codex単独で差分全体・既存呼び出し元・回帰検査・ブラウザ
 - 既存テストの範囲外攻撃fixtureを射程内へ変更。射程検査や期待ダメージを弱めず、他の既存検査も保持。
 - プロジェクトのNode/Yarn/Vitestでlint/build/144 tests PASS。
 - 既設の同一バージョンVitest/coverage-v8ペアで全production TS/TSXを計測。4指標すべて80%以上のthresholdを実行。テスト補助を分母に入れていない。未importの旧DifficultySelectやmain/UnitIconも分母に含む。
-- 既設Chromium/Playwrightでビルド出力をローカル確認。新規ツール・新規依存・画像生成・配信なし。lock/package/tutorial/既存AIロジック/武装/兵種unionを変更していない。
-- PR作成前にorigin/mainとの差分全体と履歴を確認。秘密情報・外部送信・外部公開・他repoへの書込みなし。
+- 既設Chromium/Playwrightでビルド出力をローカル確認。新規ツール・新規依存・画像生成・手動publishなし（初回自動previewの発生・撤去は下記）。lock/package/tutorial/既存AIロジック/武装/兵種unionを変更していない。
+- PR作成前にorigin/mainとの差分全体と履歴を確認。秘密情報の埋込み・外部への秘密情報送信・他repoへの書込みなし。
 
 ## 制限
 
 traceは受動的な相手に対する勝利到達の存在証明。均衡や人間の所要時間は未保証。Chromiumによるタッチエミュレーションであり実機iOS/Android全種の保証ではない。盤面下の行動パネルとの移動には縦スクロールが必要。保存は従来どおり1枠。既存CPUセーブの元モードだけを維持し、CPUの能力改善・新難易度・追加入口は実装していない。
 
 重大・高優先度の未解決指摘なし。最終headのCI合格をマージ条件とする。
+
+## PR段での追加指摘
+
+- 最初のCIで操作テスト1件が5000msに到達。timeoutや入力/勝利判定は緩めず、fake timerの自動tickを20msから1msへ変更し、単なる待ち時間を削減。release checksを全再実行して合格。
+- 最初のpushで既存Cloudflare Pages連携がpreviewを自動公開。事前確認不足として記録し、今回のbranch/commitに一致するpreviewだけを既設認証で削除（API 404確認）。productionのdeployment ID/commitは維持された。以後のpushおよびsquash件名は公式の `[CF-Pages-Skip]` prefixを必須にする。初回の自動preview発生を「配信なし」とは扱わない。

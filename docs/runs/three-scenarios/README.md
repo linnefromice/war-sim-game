@@ -54,3 +54,7 @@ flock /tmp/research-hub-w2-w3-w8-heavy.lock node scripts/three-scenarios-coverag
 ```
 
 この補助スクリプトは一時config・matcher登録と、本repoのnode_modules内の一時symlinkだけを作り、終了時に撤去する。新規依存導入、lock更新、参照先repoの変更は行わない。既設runner/pluginが同じバージョンでなければ停止する。全production TS/TSX（未importのファイルを含む）を対象に、テスト・テスト補助・型宣言を除き、statement/branch/function/lineを各80%以上として判定する。集計は`coverage/coverage-summary.json`。
+
+## Git操作時の配信抑止
+
+既存Cloudflare PagesのGit連携がpush時に自動配信する。本実行の初回pushでpreviewが公開されたため、対象previewだけを削除した（`deployment-guard.json`）。以後はcommit messageとsquash件名の**先頭**を `[CF-Pages-Skip]` とし、Pagesだけをskipする。通常のGitHub CIは実行する。この指定ができない場合はpush/マージせず停止する。[Cloudflare公式仕様](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/#skipping-a-build-via-a-commit-message)。

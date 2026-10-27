@@ -1,0 +1,27 @@
+{
+  "time": "2026-10-27T16:48:41.620Z",
+  "incident": "Existing Git integration automatically published first push before skip guard was known; this run preview removed.",
+  "preview": {
+    "id": "e92456fc-7fff-4b61-9d09-3a2c3ef4462d",
+    "commit": "bb85b2707457e90ee85ac4278922198a9876f678",
+    "branch": "feat/three-scenarios",
+    "environment": "preview"
+  },
+  "removed": true,
+  "verification": {
+    "httpStatus": 404,
+    "success": false,
+    "errors": [
+      {
+        "code": 8000009,
+        "message": "The deployment ID you have specified does not exist. Update the deployment ID and try again. "
+      }
+    ]
+  },
+  "productionUnchanged": {
+    "id": "f9bb8224-46f6-4da4-b7fb-56bbdb02025b",
+    "commit": "b1d0d81033655b0f773f208e3f9e8d15e70f53c8"
+  },
+  "futureCommitPrefix": "[CF-Pages-Skip]",
+  "officialDocs": "https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/#skipping-a-build-via-a-commit-message"
+}

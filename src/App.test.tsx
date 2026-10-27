@@ -11,7 +11,7 @@ import { ATTACK_DURATION, MOVE_DURATION, TURN_CHANGE_DURATION } from "./pages/St
 vi.mock("./pages/Stage/UnitIcon", () => ({ UnitIcon: () => <span /> }));
 
 describe("hotseat application lifecycle", () => {
-  beforeEach(() => { Object.defineProperty(HTMLElement.prototype, "scrollIntoView", { configurable: true, value: vi.fn() }); localStorage.clear(); vi.useFakeTimers({ shouldAdvanceTime: true }); });
+  beforeEach(() => { Object.defineProperty(HTMLElement.prototype, "scrollIntoView", { configurable: true, value: vi.fn() }); localStorage.clear(); vi.useFakeTimers({ shouldAdvanceTime: true, advanceTimeDelta: 1 }); });
   afterEach(() => vi.useRealTimers());
   it.each([1, 2])("plays to Player %i victory, restarts cleanly and switches maps", async winner => {
     const user = userEvent.setup();

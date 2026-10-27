@@ -3,27 +3,27 @@ Existing coverage tool: Vitest 4.0.16, coverage-v8 4.0.16. Project release check
  RUN  v4.0.16 /home/paru/repository/github.com/linnefromice/war-sim-game
       Coverage enabled with v8
 
+ ✓ src/game/ai.test.ts (15 tests) 6ms
+ ✓ src/scenarios/scenarios.test.ts (6 tests) 13ms
  ✓ src/pages/Stage/logics.test.ts (15 tests) 5ms
  ✓ src/game/statistics.test.ts (7 tests) 4ms
- ✓ src/game/ai.test.ts (15 tests) 7ms
- ✓ src/scenarios/scenarios.test.ts (6 tests) 10ms
- ✓ src/game/gameReducer.test.ts (67 tests) 13ms
- ✓ src/scenarios/victoryTrace.test.ts (6 tests) 9ms
+ ✓ src/game/gameReducer.test.ts (67 tests) 18ms
+ ✓ src/scenarios/victoryTrace.test.ts (6 tests) 10ms
  ✓ src/game/saveLoad.test.ts (15 tests) 12ms
- ✓ src/pages/Stage/StageWin.test.tsx (1 test) 557ms
-     ✓ shows victory screen when all enemy units are eliminated  556ms
- ✓ src/pages/Stage/StageKeyboard.test.tsx (2 tests) 1071ms
-     ✓ keeps native focus navigation, rejects illegal targets, permits Player 2 and undo  950ms
- ✓ src/pages/Stage/Stage.test.tsx (4 tests) 2222ms
-     ✓ allows a unit to attack an enemy unit and reduce their HP  1538ms
- ✓ src/App.test.tsx (6 tests) 7086ms
-     ✓ plays to Player 1 victory, restarts cleanly and switches maps  3425ms
-     ✓ plays to Player 2 victory, restarts cleanly and switches maps  3372ms
+ ✓ src/pages/Stage/StageWin.test.tsx (1 test) 555ms
+     ✓ shows victory screen when all enemy units are eliminated  554ms
+ ✓ src/pages/Stage/StageKeyboard.test.tsx (2 tests) 1084ms
+     ✓ keeps native focus navigation, rejects illegal targets, permits Player 2 and undo  958ms
+ ✓ src/pages/Stage/Stage.test.tsx (4 tests) 2218ms
+     ✓ allows a unit to attack an enemy unit and reduce their HP  1540ms
+ ✓ src/App.test.tsx (6 tests) 2487ms
+     ✓ plays to Player 1 victory, restarts cleanly and switches maps  1275ms
+     ✓ plays to Player 2 victory, restarts cleanly and switches maps  995ms
 
  Test Files  11 passed (11)
       Tests  144 passed (144)
-   Start at  01:42:01
-   Duration  8.01s (transform 1.48s, setup 440ms, import 2.08s, tests 11.00s, environment 3.08s)
+   Start at  01:48:46
+   Duration  3.44s (transform 1.50s, setup 581ms, import 2.08s, tests 6.41s, environment 3.17s)
 
  % Coverage report from v8
 -------------------|---------|----------|---------|---------|-------------------
